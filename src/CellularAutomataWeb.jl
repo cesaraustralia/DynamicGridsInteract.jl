@@ -1,5 +1,36 @@
 module CellularAutomataWeb
 
-greet() = print("Hello World!")
 
-end # module
+using AssetRegistry, 
+      Blink, 
+      CellularAutomataBase, 
+      FieldMetadata,
+      Flatten, 
+      Images,
+      Interact, 
+      InteractBase, 
+      InteractBulma, 
+      Lazy, 
+      Mux, 
+      WebSockets 
+
+# Mixins
+using CellularAutomataBase: @ImageProc, @FPS, @Output, frametoimage
+
+import CellularAutomataBase: deleteframes!, storeframe!, updateframe!,
+    showframe, delay, normalizeframe, 
+    getfps, gettlast, curframe, hasfps, hasminmax, hasprocessor, 
+    settimestamp!, setrunning!, setfps!,
+    isshowable, isasync, isrunning
+
+import Base: length, size, firstindex, lastindex, getindex, setindex!, push!, append!
+
+import InteractBase: WidgetTheme, libraries
+
+export BlinkOutput, MuxOutput
+
+include("web.jl")
+include("blink.jl")
+include("mux.jl")
+
+end
