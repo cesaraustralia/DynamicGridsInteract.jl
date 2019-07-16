@@ -15,10 +15,10 @@ using AssetRegistry,
       WebSockets 
 
 # Mixins
-using CellularAutomataBase: @ImageProc, @FPS, @Output, frametoimage
+using CellularAutomataBase: @ImageProc, @Graphic, @Output, frametoimage
 
 import CellularAutomataBase: deleteframes!, storeframe!, updateframe!,
-    showframe, delay, normalizeframe, 
+    showframe, delay, normaliseframe, 
     getfps, gettlast, curframe, hasfps, hasminmax, hasprocessor, 
     settimestamp!, setrunning!, setfps!,
     isshowable, isasync, isrunning

@@ -1,18 +1,19 @@
 
 const csskey = AssetRegistry.register(joinpath(dirname(pathof(CellularAutomataWeb)), "../assets/web.css"))
 
+# TODO update themes
 # Custom css theme
-struct WebTheme <: WidgetTheme end
+# struct WebTheme <: WidgetTheme end
 
-libraries(::WebTheme) = vcat(libraries(Bulma()), [csskey])
+# libraries(::WebTheme) = vcat(libraries(InteractBulma.BulmaTheme()), [csskey])
 
 
 "Web outputs, such as BlinkOutput and MuxServer"
-abstract type AbstractWebOutput{T} <: AbstractOutput{T} end
+abstract type AbstractWebOutput{T} <: AbstractGraphicOutput{T} end
 
 
 " The backend interface for BlinkOuput and MuxServer"
-@ImageProc @FPS @Output mutable struct WebInterface{P,IM,TI} <: AbstractOutput{T}
+@ImageProc @Graphic @Output mutable struct WebInterface{P,IM,TI} <: AbstractGraphicOutput{T}
     page::P
     image_obs::IM
     t_obs::TI
@@ -20,12 +21,12 @@ end
 
 """
     WebInterface(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
-             processor=GreyscaleProcessor(), theme=WebTheme())
+             processor=GreyscaleProcessor(), extrainit=Dict())
 """
 WebInterface(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
-             processor=GreyscaleProcessor(), theme=WebTheme(), extrainit=Dict()) = begin
+             processor=GreyscaleProcessor(), extrainit=Dict(), slider_throttle=0.1) = begin
 
-    settheme!(theme)
+    # settheme!(theme)
 
     init = deepcopy(frames[1])
 
@@ -56,7 +57,7 @@ WebInterface(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
     fps_slider = slider(1:200, value=fps, label="FPS")
     basewidgets = hbox(buttons..., vbox(dom"span"("Frames"), timespan_text), fps_slider, init_drop)
 
-    rulesliders = buildsliders(ruleset)
+    rulesliders = buildsliders(ruleset, slider_throttle)
 
 
     # Construct the interface object
@@ -70,7 +71,7 @@ WebInterface(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
                              processor, page, image_obs, t_obs)
 
     # Initialise image
-    image_obs[] = webimage(interface, frames[1], 1)
+    image_obs[] = webimage(interface, normaliseframe(ruleset, frames[1]), 1)
 
     # Control mappings
     on(observe(sim)) do _
@@ -93,17 +94,18 @@ WebInterface(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
     interface
 end
 
-buildsliders(ruleset) = begin
+buildsliders(ruleset, slider_throttle) = begin
     params = Flatten.flatten(ruleset.rules)
     fnames = fieldnameflatten(ruleset.rules)
     lims = metaflatten(ruleset.rules, FieldMetadata.limits)
+    ranges = buildrange.(lims, params)
     parents = parentnameflatten(ruleset.rules)
     descriptions = metaflatten(ruleset.rules, FieldMetadata.description)
-    attributes = broadcast((p, n, d) -> Dict(:title => "$p.$n: $d"), parents, fnames, descriptions)
+    attributes = (p, n, d) -> Dict(:title => "$p.$n: $d").(parents, fnames, descriptions)
 
-    make_slider(val, lab, lims, attr) = slider(buildrange(lims); label=string(lab), value=val, attributes=attr)
-    sliders = broadcast(make_slider, params, fnames, lims, attributes)
-    slider_obs = map((s...) -> s, observe.(sliders)...)
+
+    sliders = make_slider.(params, fnames, ranges, attributes)
+    slider_obs = map((s...) -> s, throttle.(slider_throttle, observe.(sliders))...)
     on(slider_obs) do s
         ruleset.rules = Flatten.reconstruct(ruleset.rules, s)
     end
@@ -125,12 +127,17 @@ buildsliders(ruleset) = begin
     vbox(slider_groups...)
 end
 
-buildrange(lim::Tuple{Float64,Float64}) = lim[1]:(lim[2]-lim[1])/400:lim[2]
-buildrange(lim::Tuple{Int,Int}) = lim[1]:1:lim[2]
+
+make_slider(val, lab, rng, attr) = slider(rng; label=string(lab), value=val, attributes=attr)
+
+buildrange(lim::Tuple{AbstractFloat,AbstractFloat}, val::T) where T = 
+    T(lim[1]):(T(lim[2])-T(lim[1]))/400:T(lim[2])
+buildrange(lim::Tuple{Int,Int}, val::T) where T = T(lim[1]):1:T(lim[2])
 
 webimage(interface, frame, t) = dom"div"(frametoimage(interface, frame, t))
 
 
+# CellularAutomataBase interface
 CellularAutomataBase.isasync(o::WebInterface) = true
 
 CellularAutomataBase.showframe(o::WebInterface, frame::AbstractArray, t) = begin
