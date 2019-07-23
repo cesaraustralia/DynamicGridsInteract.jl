@@ -2,7 +2,7 @@
 """
 A html output using Interact.jl and an Electron window through Blink.jl
 BlinkOutput automatically generates sliders to control simulations
-in realtime. args and kwargs are passed to [`WebInterface`]
+in realtime. args and kwargs are passed to [`WebOutput`]
 
 ## Example
 ```julia
@@ -22,20 +22,20 @@ BlinkOutput(init, model)
 - `processor = Greyscale()`
 - `theme` A css theme.
 """
-mutable struct BlinkOutput{T, I<:WebInterface{T}} <: AbstractOutput{T}
+mutable struct BlinkOutput{T, I<:WebOutput{T}} <: AbstractOutput{T}
     interface::I
     window::Blink.AtomShell.Window
 end
 
 BlinkOutput(frames::T, model, args...; kwargs...) where T <: AbstractVector = begin
-    interface = WebInterface(frames, model, args...; kwargs...)
+    interface = WebOutput(frames, model, args...; kwargs...)
     window = Blink.AtomShell.Window()
     body!(window, interface.page)
 
     BlinkOutput{T,typeof(interface)}(interface, window)
 end
 
-# Forward output methods to WebInterface: BlinkOutput is just a wrapper.
+# Forward output methods to WebOutput: BlinkOutput is just a wrapper.
 @forward BlinkOutput.interface length, size, endof, firstindex, lastindex, getindex,
     setindex!, push!, append!,
     deleteframes!, storeframe!, updateframe!,

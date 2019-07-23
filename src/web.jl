@@ -13,17 +13,20 @@ abstract type AbstractWebOutput{T} <: AbstractGraphicOutput{T} end
 
 
 " The backend interface for BlinkOuput and MuxServer"
-@ImageProc @Graphic @Output mutable struct WebInterface{P,IM,TI} <: AbstractGraphicOutput{T}
+@ImageProc @Graphic @Output mutable struct WebOutput{P,IM,TI} <: AbstractGraphicOutput{T}
     page::P
     image_obs::IM
     t_obs::TI
 end
 
+Base.display(o::WebOutput) = display(o.page)
+Base.show(o::WebOutput) = show(o.page)
+
 """
-    WebInterface(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
+    WebOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
              processor=GreyscaleProcessor(), extrainit=Dict())
 """
-WebInterface(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
+WebOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
              processor=GreyscaleProcessor(), extrainit=Dict(), slider_throttle=0.1) = begin
 
     # settheme!(theme)
@@ -66,9 +69,8 @@ WebInterface(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
     # Put it all together into a webpage
     page = vbox(hbox(image_obs), timedisplay, basewidgets, rulesliders)
 
-    interface = WebInterface{typeof.((frames, fps, timestamp, tref, processor, page, image_obs, t_obs))...}(
-                             frames, running, fps, showfps, timestamp, tref, tlast, store,
-                             processor, page, image_obs, t_obs)
+    interface = WebOutput(frames, running, fps, showfps, timestamp, tref, tlast, store,
+                          processor, page, image_obs, t_obs)
 
     # Initialise image
     image_obs[] = webimage(interface, normaliseframe(ruleset, frames[1]), 1)
@@ -138,9 +140,9 @@ webimage(interface, frame, t) = dom"div"(frametoimage(interface, frame, t))
 
 
 # CellularAutomataBase interface
-CellularAutomataBase.isasync(o::WebInterface) = true
+CellularAutomataBase.isasync(o::WebOutput) = true
 
-CellularAutomataBase.showframe(o::WebInterface, frame::AbstractArray, t) = begin
+CellularAutomataBase.showframe(o::WebOutput, frame::AbstractArray, t) = begin
     o.image_obs[] = webimage(o, frame, t)
     o.t_obs[] = t
 end

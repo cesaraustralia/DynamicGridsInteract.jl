@@ -31,7 +31,7 @@ MuxServer(frames::T, rulset; port=8080, kwargs...) where T <: AbstractVector = b
     server = MuxServer(frames, port)
     store = false
     function muxapp(req)
-        WebInterface(deepcopy(server.frames), deepcopy(rulset); kwargs...).page
+        WebOutput(deepcopy(server.frames), deepcopy(rulset); kwargs...).page
     end
     webio_serve(page("/", req -> muxapp(req)), port)
     server

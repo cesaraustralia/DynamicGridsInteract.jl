@@ -27,7 +27,7 @@ import Base: length, size, firstindex, lastindex, getindex, setindex!, push!, ap
 
 import InteractBase: WidgetTheme, libraries
 
-export BlinkOutput, MuxOutput
+export AbstractWebOutput, WebOutput, BlinkOutput, MuxOutput
 
 include("web.jl")
 include("blink.jl")
