@@ -15,17 +15,16 @@ using AssetRegistry,
       WebSockets 
 
 # Mixins
-using CellularAutomataBase: @ImageProc, @Graphic, @Output, frametoimage
+using CellularAutomataBase: @ImageProc, @Graphic, @Output, AbstractSimData, SimData
 
-import CellularAutomataBase: deleteframes!, storeframe!, updateframe!,
-    showframe, delay, normaliseframe, 
-    getfps, gettlast, curframe, hasfps, hasminmax, hasprocessor, 
-    settimestamp!, setrunning!, setfps!,
-    isshowable, isasync, isrunning
-
-import Base: length, size, firstindex, lastindex, getindex, setindex!, push!, append!
+import Base: length, size, firstindex, lastindex, getindex, setindex!, push!, append!, parent
 
 import InteractBase: WidgetTheme, libraries
+
+import CellularAutomataBase: deleteframes!, storeframe!, updateframe!,
+    frames, showframe, delay, normaliseframe, frametoimage,
+    fps, showfps, gettlast, curframe, hasprocessor, 
+    settimestamp!, setrunning!, setfps!, isshowable, isasync, isrunning
 
 export AbstractWebOutput, WebOutput, BlinkOutput, MuxOutput
 

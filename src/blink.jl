@@ -22,7 +22,7 @@ BlinkOutput(init, model)
 - `processor = Greyscale()`
 - `theme` A css theme.
 """
-mutable struct BlinkOutput{T, I<:WebOutput{T}} <: AbstractOutput{T}
+mutable struct BlinkOutput{T, I<:WebOutput{T}} <: AbstractWebOutput{T}
     interface::I
     window::Blink.AtomShell.Window
 end
@@ -36,18 +36,24 @@ BlinkOutput(frames::T, model, args...; kwargs...) where T <: AbstractVector = be
 end
 
 # Forward output methods to WebOutput: BlinkOutput is just a wrapper.
-@forward BlinkOutput.interface length, size, endof, firstindex, lastindex, getindex,
-    setindex!, push!, append!,
-    deleteframes!, storeframe!, updateframe!,
-    delay, normalizeframe, processframe, webimage,
-    settime!, settimestamp!, setrunning!, setfps!,
-    getfps, gettlast, isshowable, isasync, curframe,
-    hasfps, hasprocessor
+@forward BlinkOutput.interface length, size, endof, firstindex, lastindex,
+    getindex, setindex!, push!, append!,
+    frames, fps, gettlast, curframe, delay,
+    isshowable, isasync, hasprocessor,
+    normaliseframe, frametoimage, deleteframes!, storeframe!, updateframe!,
+    settime!, settimestamp!, setrunning!, setfps!
+
+parent(o::BlinkOutput) = o.interface
+
 
 # Running checks depend on the blink window still being open
 isrunning(o::BlinkOutput) = isalive(o) && isrunning(o.interface)
 
 isalive(o::BlinkOutput) = o.window.content.sock.state == WebSockets.ReadyState(1)
 
-showframe(o::BlinkOutput, rs::AbstractRuleset, args...) = showframe(o.interface, rs, args...)
-showframe(o::BlinkOutput, frame::AbstractArray, args...) = showframe(o.interface, frame, args...)
+storeframe(o::BlinkOutput, data::AbstractSimData, args...) = showframe(parent(o), data, args...)
+showframe(o::BlinkOutput, data::AbstractSimData, args...) = showframe(parent(o), data, args...)
+showframe(frame::AbstractArray, o::BlinkOutput, ruleset::AbstractRuleset, args...) =
+    showframe(frame, parent(o), ruleset, args...)
+showframe(frame::AbstractArray, o::BlinkOutput, data::AbstractSimData, args...) =
+    showframe(frame, parent(o), data, args...)

@@ -9,18 +9,32 @@ const csskey = AssetRegistry.register(joinpath(dirname(pathof(CellularAutomataWe
 
 
 "Web outputs, such as BlinkOutput and MuxServer"
-abstract type AbstractWebOutput{T} <: AbstractGraphicOutput{T} end
+abstract type AbstractWebOutput{T} <: AbstractImageOutput{T} end
 
 
-" The backend interface for BlinkOuput and MuxServer"
-@ImageProc @Graphic @Output mutable struct WebOutput{P,IM,TI} <: AbstractGraphicOutput{T}
+""" 
+Output for atom/Juno and the backend for BlinkOuput and MuxServer
+"""
+@ImageProc @Graphic @Output mutable struct WebOutput{P,IM,TI} <: AbstractWebOutput{T}
     page::P
     image_obs::IM
     t_obs::TI
 end
 
+
+# Base interface
 Base.display(o::WebOutput) = display(o.page)
 Base.show(o::WebOutput) = show(o.page)
+
+
+# CellularAutomataBase interface
+CellularAutomataBase.isasync(o::WebOutput) = true
+
+CellularAutomataBase.showframe(image::AbstractArray, o::WebOutput, t) = begin
+    o.image_obs[] = webimage(image)
+    o.t_obs[] = t
+end
+
 
 """
     WebOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
@@ -63,37 +77,37 @@ WebOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
     rulesliders = buildsliders(ruleset, slider_throttle)
 
 
-    # Construct the interface object
+    # Construct the ui object
     timestamp = 0.0; tref = 0; tlast = 1; running = false
 
     # Put it all together into a webpage
     page = vbox(hbox(image_obs), timedisplay, basewidgets, rulesliders)
 
-    interface = WebOutput(frames, running, fps, showfps, timestamp, tref, tlast, store,
+    ui = WebOutput(frames, running, fps, showfps, timestamp, tref, tlast, store,
                           processor, page, image_obs, t_obs)
 
     # Initialise image
-    image_obs[] = webimage(interface, normaliseframe(ruleset, frames[1]), 1)
+    image_obs[] = webimage(frametoimage(ui, normaliseframe(ruleset, frames[1]), 1))
 
     # Control mappings
     on(observe(sim)) do _
-        sim!(interface, ruleset; init=init_drop[], tstop = timespan_obs[])
+        sim!(ui, ruleset; init=init_drop[], tstop = timespan_obs[])
     end
     on(observe(resume)) do _
-        resume!(interface, ruleset; tadd = timespan_obs[])
+        resume!(ui, ruleset; tadd = timespan_obs[])
     end
     on(observe(replay)) do _
-        replay(interface)
+        replay(ui)
     end
     on(observe(stop)) do _
-        setrunning!(interface, false)
+        setrunning!(ui, false)
     end
     on(observe(fps_slider)) do fps
-        interface.fps = fps
-        settimestamp!(interface, interface.t_obs[])
+        ui.fps = fps
+        settimestamp!(ui, ui.t_obs[])
     end
 
-    interface
+    ui
 end
 
 buildsliders(ruleset, slider_throttle) = begin
@@ -136,13 +150,4 @@ buildrange(lim::Tuple{AbstractFloat,AbstractFloat}, val::T) where T =
     T(lim[1]):(T(lim[2])-T(lim[1]))/400:T(lim[2])
 buildrange(lim::Tuple{Int,Int}, val::T) where T = T(lim[1]):1:T(lim[2])
 
-webimage(interface, frame, t) = dom"div"(frametoimage(interface, frame, t))
-
-
-# CellularAutomataBase interface
-CellularAutomataBase.isasync(o::WebOutput) = true
-
-CellularAutomataBase.showframe(o::WebOutput, frame::AbstractArray, t) = begin
-    o.image_obs[] = webimage(o, frame, t)
-    o.t_obs[] = t
-end
+webimage(image) = dom"div"(image)
