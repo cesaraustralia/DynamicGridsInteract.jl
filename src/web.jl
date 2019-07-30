@@ -12,7 +12,7 @@ const csskey = AssetRegistry.register(joinpath(dirname(pathof(CellularAutomataWe
 abstract type AbstractWebOutput{T} <: AbstractImageOutput{T} end
 
 
-""" 
+"""
 Output for atom/Juno and the backend for BlinkOuput and MuxServer
 """
 @ImageProc @Graphic @Output mutable struct WebOutput{P,IM,TI} <: AbstractWebOutput{T}
@@ -147,7 +147,7 @@ end
 make_slider(val, lab, rng, attr) = slider(rng; label=string(lab), value=val, attributes=attr)
 
 buildrange(lim::Tuple{AbstractFloat,AbstractFloat}, val::T) where T = 
-    T(lim[1]):(T(lim[2])-T(lim[1]))/400:T(lim[2])
+    T(lim[1]):(T(lim[2])-T(lim[1]))/1000:T(lim[2])
 buildrange(lim::Tuple{Int,Int}, val::T) where T = T(lim[1]):1:T(lim[2])
 
 webimage(image) = dom"div"(image)
