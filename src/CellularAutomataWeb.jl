@@ -1,18 +1,18 @@
 module CellularAutomataWeb
 
 
-using AssetRegistry, 
-      Blink, 
-      CellularAutomataBase, 
+using AssetRegistry,
+      Blink,
+      CellularAutomataBase,
       FieldMetadata,
-      Flatten, 
+      Flatten,
       Images,
-      Interact, 
-      InteractBase, 
-      InteractBulma, 
-      Lazy, 
-      Mux, 
-      WebSockets 
+      Interact,
+      InteractBase,
+      InteractBulma,
+      Lazy,
+      Mux,
+      WebSockets
 
 # Mixins
 using CellularAutomataBase: @ImageProc, @Graphic, @Output, AbstractSimData, SimData
@@ -21,9 +21,9 @@ import Base: length, size, firstindex, lastindex, getindex, setindex!, push!, ap
 
 import InteractBase: WidgetTheme, libraries
 
-import CellularAutomataBase: deleteframes!, storeframe!, updateframe!,
+import CellularAutomataBase: storeframe!, updateframe!,
     frames, showframe, delay, normaliseframe, frametoimage,
-    fps, showfps, gettlast, curframe, hasprocessor, 
+    fps, showfps, gettlast, curframe, 
     settimestamp!, setrunning!, setfps!, isshowable, isasync, isrunning
 
 export AbstractWebOutput, WebOutput, BlinkOutput, MuxOutput

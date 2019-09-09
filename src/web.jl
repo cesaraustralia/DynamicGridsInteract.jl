@@ -30,9 +30,9 @@ Base.show(o::WebOutput) = show(o.page)
 # CellularAutomataBase interface
 CellularAutomataBase.isasync(o::WebOutput) = true
 
-CellularAutomataBase.showframe(image::AbstractArray, o::WebOutput, t) = begin
-    o.image_obs[] = webimage(image)
+CellularAutomataBase.showframe(image::AbstractArray{RGB24,2}, o::WebOutput, t) = begin
     o.t_obs[] = t
+    o.image_obs[] = webimage(image)
 end
 
 
@@ -41,7 +41,7 @@ end
              processor=GreyscaleProcessor(), extrainit=Dict())
 """
 WebOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
-             processor=GreyscaleProcessor(), extrainit=Dict(), slider_throttle=0.1) = begin
+          processor=GreyscaleProcessor(), extrainit=Dict(), slider_throttle=0.1) = begin
 
     # settheme!(theme)
 
@@ -87,7 +87,7 @@ WebOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
                           processor, page, image_obs, t_obs)
 
     # Initialise image
-    image_obs[] = webimage(frametoimage(ui, normaliseframe(ruleset, frames[1]), 1))
+    image_obs[] = webimage(frametoimage(ui, ruleset, frames[1], 1))
 
     # Control mappings
     on(observe(sim)) do _

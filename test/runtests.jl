@@ -45,7 +45,7 @@ leonardo2 = [l0 l0 l0 l0 l0 l0;
 
 # Test for WebOutput
 ruleset = Ruleset(Life(); init=init, overflow=WrapOverflow())
-processor = ColorSchemeProcessor(ColorSchemes.leonardo)
+processor = ColorProcessor(ColorSchemes.leonardo, nothing, nothing)
 output = WebOutput(init, ruleset; store=true, processor=processor) 
 sim!(output, ruleset; init=init, tstop=2) 
 sleep(1.5)
@@ -58,7 +58,6 @@ sleep(1.5)
 # Make sure the image sent to the browser by the observable is showing the 
 # final frame with the leonardo colorsheme
 @test output.image_obs[].children.tail[1] == leonardo2
-replay(output, ruleset)
 sleep(1.5)
 @test output.image_obs[].children.tail[1] == leonardo2
 
