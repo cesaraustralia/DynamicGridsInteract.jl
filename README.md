@@ -15,7 +15,7 @@ To use:
 ```julia
 using DynamicGridsInteract
 output = InteractOutput(init, ruleset; fps=25, showfps=fps, store=false,
-                        processor=GreyscaleProcessor(), extrainit=Dict())
+                        processor=ColorProcessor(), extrainit=Dict())
 display(output)
 ```
 
