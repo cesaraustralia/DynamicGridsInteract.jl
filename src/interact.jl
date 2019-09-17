@@ -1,5 +1,5 @@
 
-const csskey = AssetRegistry.register(joinpath(dirname(pathof(CellularAutomataWeb)), "../assets/web.css"))
+const csskey = AssetRegistry.register(joinpath(dirname(pathof(DynamicGridsInteract)), "../assets/web.css"))
 
 # TODO update themes
 # Custom css theme
@@ -8,14 +8,15 @@ const csskey = AssetRegistry.register(joinpath(dirname(pathof(CellularAutomataWe
 # libraries(::WebTheme) = vcat(libraries(InteractBulma.BulmaTheme()), [csskey])
 
 
-"Web outputs, such as BlinkOutput and MuxServer"
-abstract type AbstractWebOutput{T} <: AbstractImageOutput{T} end
+"Interact outputs including InteractOuput, ElectronOutput and ServerOutput"
+abstract type AbstractInteractOutput{T} <: AbstractImageOutput{T} end
 
 
 """
-Output for atom/Juno and the backend for BlinkOuput and MuxServer
+Output for Atom/Juno and Jupyter notebooks, 
+and the backend for ElectronOutput and ServerOutput
 """
-@ImageProc @Graphic @Output mutable struct WebOutput{P,IM,TI} <: AbstractWebOutput{T}
+@ImageProc @Graphic @Output mutable struct InteractOutput{P,IM,TI} <: AbstractInteractOutput{T}
     page::P
     image_obs::IM
     t_obs::TI
@@ -23,24 +24,24 @@ end
 
 
 # Base interface
-Base.display(o::WebOutput) = display(o.page)
-Base.show(o::WebOutput) = show(o.page)
+Base.display(o::InteractOutput) = display(o.page)
+Base.show(o::InteractOutput) = show(o.page)
 
 
-# CellularAutomataBase interface
-CellularAutomataBase.isasync(o::WebOutput) = true
+# DynamicGrids interface
+DynamicGrids.isasync(o::InteractOutput) = true
 
-CellularAutomataBase.showframe(image::AbstractArray{RGB24,2}, o::WebOutput, t) = begin
+DynamicGrids.showframe(image::AbstractArray{RGB24,2}, o::InteractOutput, t) = begin
     o.t_obs[] = t
     o.image_obs[] = webimage(image)
 end
 
 
 """
-    WebOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
+    InteractOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
              processor=GreyscaleProcessor(), extrainit=Dict())
 """
-WebOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
+InteractOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
           processor=GreyscaleProcessor(), extrainit=Dict(), slider_throttle=0.1) = begin
 
     # settheme!(theme)
@@ -83,7 +84,7 @@ WebOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
     # Put it all together into a webpage
     page = vbox(hbox(image_obs), timedisplay, basewidgets, rulesliders)
 
-    ui = WebOutput(frames, running, fps, showfps, timestamp, tref, tlast, store,
+    ui = InteractOutput(frames, running, fps, showfps, timestamp, tref, tlast, store,
                           processor, page, image_obs, t_obs)
 
     # Initialise image

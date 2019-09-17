@@ -1,4 +1,4 @@
-using CellularAutomataBase, CellularAutomataWeb, Test, Colors, ColorSchemes
+using DynamicGrids, DynamicGridsInteract, Test, Colors, ColorSchemes
 
 # life glider sims
 
@@ -43,10 +43,10 @@ leonardo2 = [l0 l0 l0 l0 l0 l0;
              l0 l0 l0 l0 l0 l1;
              l0 l0 l0 l0 l0 l0]
 
-# Test for WebOutput
+# Test for InteractOutput
 ruleset = Ruleset(Life(); init=init, overflow=WrapOverflow())
 processor = ColorProcessor(ColorSchemes.leonardo, nothing, nothing)
-output = WebOutput(init, ruleset; store=true, processor=processor) 
+output = InteractOutput(init, ruleset; store=true, processor=processor) 
 sim!(output, ruleset; init=init, tstop=2) 
 sleep(1.5)
 resume!(output, ruleset; tadd=3)
@@ -63,11 +63,11 @@ sleep(1.5)
 
 
 # Test for blink
-output = BlinkOutput(init, ruleset; store=true, processor=processor) 
-CellularAutomataBase.setrunning!(output, false)
+output = ElectronOutput(init, ruleset; store=true, processor=processor) 
+DynamicGrids.setrunning!(output, false)
 sim!(output, ruleset; init=init, tstop=3) 
 sleep(1.5)
-CellularAutomataBase.setrunning!(output, false)
+DynamicGrids.setrunning!(output, false)
 resume!(output, ruleset; tadd=2)
 sleep(1.5)
 

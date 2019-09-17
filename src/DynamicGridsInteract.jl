@@ -1,9 +1,9 @@
-module CellularAutomataWeb
+module DynamicGridsInteract
 
 
 using AssetRegistry,
       Blink,
-      CellularAutomataBase,
+      DynamicGrids,
       FieldMetadata,
       Flatten,
       Images,
@@ -15,21 +15,21 @@ using AssetRegistry,
       WebSockets
 
 # Mixins
-using CellularAutomataBase: @ImageProc, @Graphic, @Output, AbstractSimData, SimData
+using DynamicGrids: @ImageProc, @Graphic, @Output, AbstractSimData, SimData
 
 import Base: length, size, firstindex, lastindex, getindex, setindex!, push!, append!, parent
 
 import InteractBase: WidgetTheme, libraries
 
-import CellularAutomataBase: storeframe!, updateframe!,
+import DynamicGrids: storeframe!, updateframe!,
     frames, showframe, delay, normaliseframe, frametoimage,
     fps, showfps, gettlast, curframe, 
     settimestamp!, setrunning!, setfps!, isshowable, isasync, isrunning
 
-export AbstractWebOutput, WebOutput, BlinkOutput, MuxOutput
+export AbstractWebOutput, InteractOutput, ElectronOutput, ServerOutput
 
-include("web.jl")
-include("blink.jl")
-include("mux.jl")
+include("interact.jl")
+include("electron.jl")
+include("server.jl")
 
 end
