@@ -1,13 +1,14 @@
 # DynamicGridsInteract
 
-[![Build
-Status](https://travis-ci.com/rafaqz/DynamicGridsInteract.jl.svg?branch=master)](https://travis-ci.com/rafaqz/DynamicGridsInteract.jl)
-[![Codecov](https://codecov.io/gh/rafaqz/DynamicGridsInteract.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/rafaqz/DynamicGridsInteract.jl)
+[![Build Status](https://travis-ci.com/cesaraustralia/DynamicGridsInteract.jl.svg?branch=master)](https://travis-ci.com/cesaraustralia/DynamicGridsInteract.jl)
+[![Codecov](https://codecov.io/gh/cesaraustralia/DynamicGridsInteract.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/cesaraustralia/DynamicGridsInteract.jl)
 
 Provides web interfaces for visualising and interacting with simulations from 
 DynamicGrids.jl and packages that build on it like Dispersal.jl. 
 
-Both a Mux.jl web server and a Blink.jl electron interface are included.
+The basic InteractOutput works in Jupyter notebooks and the atom plot pane. A
+Mux.jl web server `ServerOutput` and a Blink.jl electron interface
+`ElectronOutput` are also included.
 
 
 To use:
@@ -30,4 +31,4 @@ user-defined rules.
 
 ## Documentation
 
-See the documentation for [DynamicGrids.jl](https://rafaqz.github.io/DynamicGrids.jl/dev/)
+See the documentation for [DynamicGrids.jl](https://cesaraustralia.github.io/DynamicGrids.jl/dev/)
