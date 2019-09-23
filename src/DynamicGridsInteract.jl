@@ -16,7 +16,7 @@ using AssetRegistry,
       WebSockets
 
 # Mixins
-using DynamicGrids: @ImageProc, @Graphic, @Output, AbstractSimData, SimData
+using DynamicGrids: @Image, @Graphic, @Output, AbstractSimData, SimData
 
 import Base: length, size, firstindex, lastindex, getindex, setindex!, push!, append!, parent
 

@@ -16,7 +16,7 @@ abstract type AbstractInteractOutput{T} <: AbstractImageOutput{T} end
 Output for Atom/Juno and Jupyter notebooks, 
 and the backend for ElectronOutput and ServerOutput
 """
-@ImageProc @Graphic @Output mutable struct InteractOutput{P,IM,TI} <: AbstractInteractOutput{T}
+@Image @Graphic @Output mutable struct InteractOutput{P,IM,TI} <: AbstractInteractOutput{T}
     page::P
     image_obs::IM
     t_obs::TI
@@ -42,7 +42,7 @@ end
              processor=GreyscaleProcessor(), extrainit=Dict())
 """
 InteractOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
-          processor=GreyscaleProcessor(), extrainit=Dict(), slider_throttle=0.1) = begin
+          processor=GreyscaleProcessor(), minval=0, maxval=1, extrainit=Dict(), slider_throttle=0.1) = begin
 
     # settheme!(theme)
 
@@ -85,7 +85,7 @@ InteractOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false
     page = vbox(hbox(image_obs), timedisplay, basewidgets, rulesliders)
 
     ui = InteractOutput(frames, running, fps, showfps, timestamp, tref, tlast, store,
-                          processor, page, image_obs, t_obs)
+                        processor, minval, maxval, page, image_obs, t_obs)
 
     # Initialise image
     image_obs[] = webimage(frametoimage(ui, ruleset, frames[1], 1))
