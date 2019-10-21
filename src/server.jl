@@ -27,7 +27,7 @@ simulations at the chosen port.
 - `showmax_fps`: maximum displayed frames per second
 - `port`: port number to reach the server at
 """
-ServerOutput(frames::T, rulset; port=8080, kwargs...) where T <: AbstractVector = begin
+ServerOutput(frames, rulset; port=8080, kwargs...) = begin
     server = ServerOutput(frames, port)
     store = false
     function muxapp(req)

@@ -5,6 +5,7 @@ module DynamicGridsInteract
 using AssetRegistry,
       Blink,
       DynamicGrids,
+      FieldDefaults,
       FieldMetadata,
       Flatten,
       Images,
@@ -22,10 +23,11 @@ import Base: length, size, firstindex, lastindex, getindex, setindex!, push!, ap
 
 import InteractBase: WidgetTheme, libraries
 
-import DynamicGrids: storeframe!, updateframe!,
-    frames, showframe, delay, normaliseframe, frametoimage,
-    fps, showfps, gettlast, curframe, 
-    settimestamp!, setrunning!, setfps!, isshowable, isasync, isrunning
+import DynamicGrids: storeframe!, frames, showframe, delay, normaliseframe, frametoimage,
+    fps, showfps, currentframe, frames, fps, delay,
+    isshowable, isasync, isstored, isrunning, starttime, stoptime, tspan, 
+    normaliseframe, frametoimage, finalize!, storeframe!, 
+    setstoptime!, setstarttime!, settimestamp!, setrunning!, setfps!
 
 export AbstractWebOutput, InteractOutput, ElectronOutput, ServerOutput
 

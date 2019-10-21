@@ -16,10 +16,10 @@ abstract type AbstractInteractOutput{T} <: AbstractImageOutput{T} end
 Output for Atom/Juno and Jupyter notebooks, 
 and the backend for ElectronOutput and ServerOutput
 """
-@Image @Graphic @Output mutable struct InteractOutput{P,IM,TI} <: AbstractInteractOutput{T}
-    page::P
-    image_obs::IM
-    t_obs::TI
+@Image @Graphic @Output mutable struct InteractOutput{Pa,IM,TI} <: AbstractInteractOutput{T}
+    page::Pa      | _
+    image_obs::IM | _
+    t_obs::TI     | _
 end
 
 
@@ -27,22 +27,22 @@ end
 Base.display(o::InteractOutput) = display(o.page)
 Base.show(o::InteractOutput) = show(o.page)
 
-
 # DynamicGrids interface
 DynamicGrids.isasync(o::InteractOutput) = true
 
-DynamicGrids.showframe(image::AbstractArray{RGB24,2}, o::InteractOutput, t) = begin
-    o.t_obs[] = t
+DynamicGrids.showframe(image::AbstractArray{RGB24,2}, o::InteractOutput, f) = begin
+    o.t_obs[] = f
     o.image_obs[] = webimage(image)
 end
 
 
 """
     InteractOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
-             processor=GreyscaleProcessor(), extrainit=Dict())
+                   processor=ColorProcessor(), extrainit=Dict())
 """
-InteractOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
-          processor=GreyscaleProcessor(), minval=0, maxval=1, extrainit=Dict(), slider_throttle=0.1) = begin
+InteractOutput(frame::AbstractArray, ruleset; kwargs...) = 
+    InteractOutput([frame], ruleset; kwargs...)
+InteractOutput(frames::AbstractVector, ruleset; extrainit=Dict(), slider_throttle=0.1, kwargs...) = begin
 
     # settheme!(theme)
 
@@ -57,7 +57,9 @@ InteractOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false
         dom"div"(string(t))
     end
 
-    timespan_obs = Observable{Int}(1000)
+    ui = InteractOutput(; frames=frames, page=vbox(), image_obs=image_obs, t_obs=t_obs, kwargs...)
+
+    timespan_obs = Observable{Int}(DynamicGrids.stoptime(ui))
     timespan_text = textbox("1000")
     map!(timespan_obs, observe(timespan_text)) do ts
         parse(Int, ts)
@@ -71,31 +73,25 @@ InteractOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false
     stop = button("stop")
     replay = button("replay")
 
-    buttons = store ? (sim, resume, stop, replay) : (sim, resume, stop)
-    fps_slider = slider(1:200, value=fps, label="FPS")
+    buttons = sim, resume, stop
+    fps_slider = slider(1:200, value=fps(ui), label="FPS")
     basewidgets = hbox(buttons..., vbox(dom"span"("Frames"), timespan_text), fps_slider, init_drop)
 
     rulesliders = buildsliders(ruleset, slider_throttle)
 
 
-    # Construct the ui object
-    timestamp = 0.0; tref = 0; tlast = 1; running = false
-
     # Put it all together into a webpage
-    page = vbox(hbox(image_obs), timedisplay, basewidgets, rulesliders)
-
-    ui = InteractOutput(frames, running, fps, showfps, timestamp, tref, tlast, store,
-                        processor, minval, maxval, page, image_obs, t_obs)
+    ui.page = vbox(hbox(image_obs), timedisplay, basewidgets, rulesliders)
 
     # Initialise image
     image_obs[] = webimage(frametoimage(ui, ruleset, frames[1], 1))
 
     # Control mappings
     on(observe(sim)) do _
-        sim!(ui, ruleset; init=init_drop[], tstop = timespan_obs[])
+        sim!(ui, ruleset; init=init_drop[], tspan = timespan_obs[])
     end
     on(observe(resume)) do _
-        resume!(ui, ruleset; tadd = timespan_obs[])
+        resume!(ui, ruleset; tstop = timespan_obs[])
     end
     on(observe(replay)) do _
         replay(ui)
