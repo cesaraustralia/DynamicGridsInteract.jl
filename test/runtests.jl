@@ -48,9 +48,9 @@ processor = ColorProcessor(ColorSchemes.leonardo, nothing, nothing)
     ruleset = Ruleset(Life(); init=init, overflow=WrapOverflow())
     output = InteractOutput(init, ruleset; store=true, processor=processor) 
     sim!(output, ruleset; init=init, tspan=(1, 2)) 
-    sleep(1.5)
+    sleep(5)
     resume!(output, ruleset; tstop=5)
-    sleep(1.5)
+    sleep(5)
 
     @test output[3] == test
     @test output[5] == test2
