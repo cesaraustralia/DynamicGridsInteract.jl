@@ -9,7 +9,7 @@ const csskey = AssetRegistry.register(joinpath(dirname(pathof(DynamicGridsIntera
 
 
 "Interact outputs including InteractOuput, ElectronOutput and ServerOutput"
-abstract type AbstractInteractOutput{T} <: AbstractImageOutput{T} end
+abstract type AbstractInteractOutput{T} <: ImageOutput{T} end
 
 
 """
