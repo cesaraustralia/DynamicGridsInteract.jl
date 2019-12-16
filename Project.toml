@@ -15,16 +15,24 @@ ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
 Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
 Interact = "c601a237-2ae4-5e1e-952c-7a85b0c7eef1"
 InteractBase = "d3863d7c-f0c8-5437-a7b4-3ae773c01009"
-InteractBulma = "7981ab7d-5bfa-5e03-9ec9-f3d4afc0a1ca"
 Lazy = "50d2b5c4-7a5e-59d5-8109-a42b560f39c0"
 Mixers = "2a8e4939-dab8-5edc-8f64-72a8776f13de"
 Mux = "a975b10e-0019-58db-a62f-e48ff68538c9"
 WebSockets = "104b5d7c-a370-577a-8038-80a2059c5097"
 Widgets = "cc8bc4a8-27d6-5769-a93b-9d913e69aa62"
 
+[compat]
+julia = "1"
+DynamicGrids = "0.2"
+FieldDefaults = "0.1"
+FieldMetadata = "0.1"
+Flatten = "0.3"
+Mixers = "0.1"
+
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
+
 
 [targets]
 test = ["ColorSchemes", "Test"]

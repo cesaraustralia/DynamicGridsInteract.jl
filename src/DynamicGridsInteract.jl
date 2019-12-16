@@ -11,7 +11,6 @@ using AssetRegistry,
       Images,
       Interact,
       InteractBase,
-      InteractBulma,
       Lazy,
       Mux,
       WebSockets
