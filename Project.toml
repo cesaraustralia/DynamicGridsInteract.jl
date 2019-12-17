@@ -23,7 +23,7 @@ Widgets = "cc8bc4a8-27d6-5769-a93b-9d913e69aa62"
 
 [compat]
 julia = "1"
-DynamicGrids = "0.2"
+DynamicGrids = "^0.2.1"
 FieldDefaults = "0.1"
 FieldMetadata = "0.1"
 Flatten = "0.3"
