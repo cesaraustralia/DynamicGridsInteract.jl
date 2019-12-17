@@ -1,6 +1,6 @@
 # DynamicGridsInteract
 
-[![Build Status](https://travis-ci.com/cesaraustralia/DynamicGridsInteract.jl.svg?branch=master)](https://travis-ci.com/cesaraustralia/DynamicGridsInteract.jl)
+[![Build Status](https://travis-ci.org/cesaraustralia/DynamicGridsInteract.jl.svg?branch=master)](https://travis-ci.org/cesaraustralia/DynamicGridsInteract.jl)
 [![Codecov](https://codecov.io/gh/cesaraustralia/DynamicGridsInteract.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/cesaraustralia/DynamicGridsInteract.jl)
 
 Provides web interfaces for visualising and interacting with simulations from 
