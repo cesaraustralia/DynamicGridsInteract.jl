@@ -2,8 +2,7 @@ module DynamicGridsInteract
 # Use the README as the module docs
 @doc read(joinpath(dirname(@__DIR__), "README.md"), String) DynamicGridsInteract
 
-using AssetRegistry,
-      Blink,
+using Blink,
       DynamicGrids,
       FieldDefaults,
       FieldMetadata,
@@ -13,12 +12,13 @@ using AssetRegistry,
       InteractBase,
       Lazy,
       Mux,
+      WebIO,
       WebSockets
 
 # Mixins
-using DynamicGrids: @Image, @Graphic, @Output, AbstractSimData, SimData
+using DynamicGrids: @Image, @Graphic, @Output, AbstractSimData, SimData, rules
 
-import Base: length, size, firstindex, lastindex, getindex, setindex!, push!, append!, parent
+import Base: length, size, firstindex, lastindex, getindex, setindex!, push!, append!, parent, show
 
 import InteractBase: WidgetTheme, libraries
 
