@@ -23,16 +23,25 @@ simulations at the chosen port.
 - `args`: any additional arguments to be passed to the rulset rule
 
 ### Keyword arguments
-- `fps`: frames per second
-- `showmax_fps`: maximum displayed frames per second
-- `port`: port number to reach the server at
+- `port`: port number to reach the server. ie localhost:8080 
+See [`InteractOutput`](@ref) for complete list.
+
 """
 ServerOutput(frames, rulset; port=8080, kwargs...) = begin
     server = ServerOutput(frames, port)
     store = false
-    function muxapp(req)
+    function app(request)
         InteractOutput(deepcopy(server.frames), deepcopy(rulset); kwargs...).page
     end
-    webio_serve(page("/", req -> muxapp(req)), port)
+    WebIO.webio_serve(Mux.page("/", request -> app(request)), port)
     server
 end
+
+show(io::IO, output::ServerOutput) = begin
+    println(io, typeof(output))
+    println(io, "Port: ", output.port)
+end
+
+
+
+
