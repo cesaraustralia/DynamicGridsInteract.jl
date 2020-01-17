@@ -1,5 +1,5 @@
 
-const csskey = AssetRegistry.register(joinpath(dirname(pathof(DynamicGridsInteract)), "../assets/web.css"))
+# const csskey = AssetRegistry.register(joinpath(dirname(pathof(DynamicGridsInteract)), "../assets/web.css"))
 
 # TODO update themes
 # Custom css theme
@@ -13,38 +13,40 @@ abstract type AbstractInteractOutput{T} <: ImageOutput{T} end
 
 
 """
-Output for Atom/Juno and Jupyter notebooks, 
-and the backend for ElectronOutput and ServerOutput
-"""
-@Image @Graphic @Output mutable struct InteractOutput{Pa,IM,TI} <: AbstractInteractOutput{T}
-    page::Pa      | _
-    image_obs::IM | _
-    t_obs::TI     | _
-end
-
-
-# Base interface
-Base.display(o::InteractOutput) = display(o.page)
-Base.show(o::InteractOutput) = show(o.page)
-
-# DynamicGrids interface
-DynamicGrids.isasync(o::InteractOutput) = true
-
-DynamicGrids.showframe(image::AbstractArray{RGB24,2}, o::InteractOutput, f) = begin
-    o.t_obs[] = f
-    o.image_obs[] = webimage(image)
-end
-
-
-"""
-    InteractOutput(frames::AbstractVector, ruleset; fps=25, showfps=fps, store=false,
+    InteractOutput(init, ruleset; fps=25, showfps=fps, store=false,
                    processor=ColorProcessor(), extrainit=Dict())
+
+An `Output` for Atom/Juno and Jupyter notebooks,
+and the back-end for [`ElectronOutput`](@ref) and [`ServerOutput`](@ref).
+
+
+### Arguments:
+- `init`: an Array or NamedTuple of arrays.
+- `ruleset`: the ruleset to run in the interface simulations.
+
+### Keyword Arguments:
+- `fps::Real`: frames per second
+- `showfps::Real`: maximum displayed frames per second
+- `store::Bool`: store the simulation frames to be used afterwards
+- `processor::FrameProcessor
+- `minval::Number`: Minimum value to display in the simulation
+- `maxval::Number`: Maximum value to display in the simulation
+
 """
-InteractOutput(frame::AbstractArray, ruleset; kwargs...) = 
-    InteractOutput([frame], ruleset; kwargs...)
-InteractOutput(frames::AbstractVector, ruleset; extrainit=Dict(), slider_throttle=0.1, kwargs...) = begin
+@Image @Graphic @Output mutable struct InteractOutput{Pa,IM,TI,EI} <: AbstractInteractOutput{T}
+    # Field       | Default: @Output macro chains @default_kw
+    page::Pa      | nothing
+    image_obs::IM | nothing
+    t_obs::TI     | nothing
+    extrainit::EI | nothing
+end
+
+InteractOutput(frame, ruleset; kwargs...) = InteractOutput([frame], ruleset; kwargs...)
+InteractOutput(frames::AbstractVector, ruleset; tspan=(1, 1000),
+               extrainit=Dict(), throttle=0.1, kwargs...) = begin
 
     # settheme!(theme)
+    extrainit[:init] = first(frames)
 
     init = deepcopy(frames[1])
 
@@ -57,16 +59,16 @@ InteractOutput(frames::AbstractVector, ruleset; extrainit=Dict(), slider_throttl
         dom"div"(string(t))
     end
 
-    ui = InteractOutput(; frames=frames, page=vbox(), image_obs=image_obs, t_obs=t_obs, kwargs...)
+    o = InteractOutput(; frames=frames, page=vbox(), image_obs=image_obs,
+                       t_obs=t_obs, extrainit=extrainit, kwargs...)
 
-    timespan_obs = Observable{Int}(DynamicGrids.stoptime(ui))
-    timespan_text = textbox("1000")
-    map!(timespan_obs, observe(timespan_text)) do ts
-        parse(Int, ts)
-    end
+    # timespan_obs = Observable{Int}(DynamicGrids.stoptime(ui))
+    # timespan_text = textbox("1000")
+    # map!(timespan_obs, observe(timespan_text)) do ts
+        # parse(Int, ts)
+    # end
 
-    extrainit[:init] = init
-    init_drop = dropdown(extrainit, value=init, label="Init")
+    init_drop = dropdown(extrainit, value=extrainit[:init], label="Init")
 
     sim = button("sim")
     resume = button("resume")
@@ -74,53 +76,69 @@ InteractOutput(frames::AbstractVector, ruleset; extrainit=Dict(), slider_throttl
     replay = button("replay")
 
     buttons = sim, resume, stop
-    fps_slider = slider(1:200, value=fps(ui), label="FPS")
-    basewidgets = hbox(buttons..., vbox(dom"span"("Frames"), timespan_text), fps_slider, init_drop)
+    fps_slider = slider(1:200, value=fps(o), label="FPS")
+    basewidgets = hbox(buttons..., fps_slider, init_drop)
 
-    rulesliders = buildsliders(ruleset, slider_throttle)
+    rulesliders = buildsliders(ruleset, throttle)
 
 
     # Put it all together into a webpage
-    ui.page = vbox(hbox(image_obs), timedisplay, basewidgets, rulesliders)
+    o.page = vbox(hbox(o.image_obs), timedisplay, basewidgets, rulesliders)
 
     # Initialise image
-    image_obs[] = webimage(frametoimage(ui, ruleset, frames[1], 1))
+    image_obs[] = webimage(frametoimage(o, ruleset, o[1], 1))
 
     # Control mappings
     on(observe(sim)) do _
-        sim!(ui, ruleset; init=init_drop[], tspan = timespan_obs[])
+        sim!(o, ruleset; init=init_drop[], tspan=tspan)
     end
     on(observe(resume)) do _
-        resume!(ui, ruleset; tstop = timespan_obs[])
+        resume!(o, ruleset; tstop=last(tspan))
     end
     on(observe(replay)) do _
-        replay(ui)
+        replay(o)
     end
     on(observe(stop)) do _
-        setrunning!(ui, false)
+        setrunning!(o, false)
     end
     on(observe(fps_slider)) do fps
-        ui.fps = fps
-        settimestamp!(ui, ui.t_obs[])
+        o.fps = fps
+        settimestamp!(o, o.t_obs[])
     end
 
-    ui
+    return o
 end
 
-buildsliders(ruleset, slider_throttle) = begin
-    params = Flatten.flatten(ruleset.rules)
-    fnames = fieldnameflatten(ruleset.rules)
-    lims = metaflatten(ruleset.rules, FieldMetadata.limits)
+# Base interface
+Base.display(o::InteractOutput) = display(o.page)
+Base.show(o::InteractOutput) = show(o.page)
+
+# DynamicGrids interface
+DynamicGrids.isasync(o::InteractOutput) = true
+
+DynamicGrids.showframe(image::AbstractArray{RGB24,2}, o::InteractOutput, f, t) = begin
+    o.t_obs[] = f
+    o.image_obs[] = webimage(image)
+end
+
+
+# Utils
+
+buildsliders(ruleset, _throttle) = begin
+    params = Flatten.flatten(rules(ruleset))
+    fnames = fieldnameflatten(rules(ruleset))
+    lims = metaflatten(rules(ruleset), FieldMetadata.limits)
     ranges = buildrange.(lims, params)
-    parents = parentnameflatten(ruleset.rules)
-    descriptions = metaflatten(ruleset.rules, FieldMetadata.description)
+    parents = parentnameflatten(rules(ruleset))
+    descriptions = metaflatten(rules(ruleset), FieldMetadata.description)
     attributes = (p, n, d) -> Dict(:title => "$p.$n: $d").(parents, fnames, descriptions)
 
 
-    sliders = make_slider.(params, fnames, ranges, attributes)
-    slider_obs = map((s...) -> s, throttle.(slider_throttle, observe.(sliders))...)
+    sliders = buildslider.(params, fnames, ranges, attributes)
+    slider_obs = map((s...) -> s, throttle.(_throttle, observe.(sliders))...)
     on(slider_obs) do s
         ruleset.rules = Flatten.reconstruct(ruleset.rules, s)
+        println(ruleset.rules)
     end
 
     group_title = nothing
@@ -141,9 +159,9 @@ buildsliders(ruleset, slider_throttle) = begin
 end
 
 
-make_slider(val, lab, rng, attr) = slider(rng; label=string(lab), value=val, attributes=attr)
+buildslider(val, lab, rng, attr) = slider(rng; label=string(lab), value=val, attributes=attr)
 
-buildrange(lim::Tuple{AbstractFloat,AbstractFloat}, val::T) where T = 
+buildrange(lim::Tuple{AbstractFloat,AbstractFloat}, val::T) where T =
     T(lim[1]):(T(lim[2])-T(lim[1]))/1000:T(lim[2])
 buildrange(lim::Tuple{Int,Int}, val::T) where T = T(lim[1]):1:T(lim[2])
 
