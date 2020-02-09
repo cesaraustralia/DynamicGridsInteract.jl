@@ -14,6 +14,7 @@ Mux.jl web server `ServerOutput` and a Blink.jl electron interface
 To use:
 
 ```julia
+using DynamicGrids
 using DynamicGridsInteract
 output = InteractOutput(init, ruleset; fps=25, showfps=fps, store=false,
                         processor=ColorProcessor(), extrainit=Dict())
