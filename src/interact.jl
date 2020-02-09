@@ -86,7 +86,7 @@ InteractOutput(frames::AbstractVector, ruleset; tspan=(1, 1000),
     o.page = vbox(hbox(o.image_obs), timedisplay, basewidgets, rulesliders)
 
     # Initialise image
-    image_obs[] = webimage(frametoimage(o, ruleset, o[1], 1))
+    image_obs[] = webimage(grid2image(o, ruleset, o[1], 1))
 
     # Control mappings
     on(observe(sim)) do _
@@ -116,7 +116,7 @@ Base.show(o::InteractOutput) = show(o.page)
 # DynamicGrids interface
 DynamicGrids.isasync(o::InteractOutput) = true
 
-DynamicGrids.showframe(image::AbstractArray{RGB24,2}, o::InteractOutput, f, t) = begin
+DynamicGrids.showgrid(image::AbstractArray{RGB24,2}, o::InteractOutput, f, t) = begin
     o.t_obs[] = f
     o.image_obs[] = webimage(image)
 end

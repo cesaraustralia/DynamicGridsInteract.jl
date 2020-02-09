@@ -19,6 +19,7 @@ addons:
     packages:
       - xvfb
       - xauth
+# Need to use xvfb-run on a linix server without X
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
   - if [[ `uname` = "Linux" ]]; then TESTCMD="xvfb-run julia"; else TESTCMD="julia"; fi

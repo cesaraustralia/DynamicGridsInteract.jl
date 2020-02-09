@@ -11,9 +11,9 @@ ElectronOutput(init, ruleset)
 ```
 
 ### Arguments
-- `frames::AbstractArray`: vector of matrices.
+#
+- `init`: initialisation array, or NamedTuple of arrays
 - `ruleset::Models`: DynamicGrids `Ruleset` 
-- `args`: any additional arguments to be passed to the ruleset rule
 
 ### Optional keyword arguments
 - `fps = 25`: frames per second.
@@ -27,8 +27,8 @@ mutable struct ElectronOutput{T, I<:InteractOutput{T}} <: AbstractInteractOutput
     window::Blink.AtomShell.Window
 end
 
-ElectronOutput(A, ruleset; kwargs...) = begin
-    interface = InteractOutput(A, ruleset; kwargs...)
+ElectronOutput(init, ruleset; kwargs...) = begin
+    interface = InteractOutput(init, ruleset; kwargs...)
     window = newelectronwindow(interface)
     ElectronOutput{typeof(frames(interface)),typeof(interface)}(interface, window)
 end
@@ -37,7 +37,7 @@ interface(o::ElectronOutput) = o.interface
 
 # Forward output methods to InteractOutput: ElectronOutput is just a wrapper.
 @forward ElectronOutput.interface length, size, endof, firstindex, lastindex,
-    getindex, setindex!, push!, append!, storeframe!,
+    getindex, setindex!, push!, append!, storegrid!,
     frames, starttime, stoptime, tspan, setrunning!, setstarttime!, setstoptime!,
     settimestamp!, fps, setfps!, showfps, isasync, isstored,
     isshowable, finalize!, delay
@@ -47,10 +47,10 @@ isalive(o::ElectronOutput) = o.window.content.sock.state == WebSockets.ReadyStat
 # Running checks depend on the blink window still being open
 DynamicGrids.isrunning(o::ElectronOutput) = isalive(o) && isrunning(o.interface)
 
-DynamicGrids.showframe(o::ElectronOutput, args...) = 
-    showframe(interface(o), args...)
-DynamicGrids.showframe(o::ElectronOutput, data::AbstractSimData, args...) = 
-    showframe(interface(o), data, args...)
+DynamicGrids.showgrid(o::ElectronOutput, args...) = 
+    showgrid(interface(o), args...)
+DynamicGrids.showgrid(o::ElectronOutput, data::AbstractSimData, args...) = 
+    showgrid(interface(o), data, args...)
 
 newelectronwindow(interface) = begin
     window = Blink.AtomShell.Window()
