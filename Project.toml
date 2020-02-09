@@ -20,7 +20,7 @@ WebIO = "0f1e0344-ec1d-5b48-a673-e5cf874b6c29"
 WebSockets = "104b5d7c-a370-577a-8038-80a2059c5097"
 
 [compat]
-DynamicGrids = "0.3"
+DynamicGrids = "0.3, 0.5"
 FieldDefaults = "0.1"
 FieldMetadata = "0.1"
 Flatten = "0.3"
