@@ -21,13 +21,13 @@ WebIO = "0f1e0344-ec1d-5b48-a673-e5cf874b6c29"
 WebSockets = "104b5d7c-a370-577a-8038-80a2059c5097"
 
 [compat]
-julia = "1"
-DynamicGrids = "0.5"
+DynamicGrids = "0.5, 0.6"
 FieldDefaults = "0.1"
 FieldMetadata = "0.1"
 Flatten = "0.3"
 Images = "0.21"
 Mixers = "0.1"
+julia = "1"
 
 [extras]
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
