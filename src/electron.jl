@@ -1,5 +1,7 @@
 
 """
+    ElectronOutput(init, ruleset::Ruleset; kwargs...)
+
 A html output using Interact.jl and an Electron window through Blink.jl
 ElectronOutput automatically generates sliders to control simulations
 in realtime. args and kwargs are passed to [`InteractOutput`]
@@ -15,19 +17,14 @@ ElectronOutput(init, ruleset)
 - `init`: initialisation array, or `NamedTuple` of arrays
 - `ruleset::Ruleset`: A DynamicGrids `Ruleset` 
 
-### Optional keyword arguments
-- `fps = 25`: frames per second.
-- `showfps = fps`: maximum displayed frames per second
-- `store::Bool = false`: save frames or not.
-- `processor = Greyscale()`
-- `theme` A css theme.
+Keyword arguments are passed to [`InteractOutput`](@ref).
 """
 mutable struct ElectronOutput{T, I<:InteractOutput{T}} <: AbstractInteractOutput{T}
     interface::I
     window::Blink.AtomShell.Window
 end
 
-ElectronOutput(init::AbstractArray, ruleset::Ruleset; kwargs...) = begin
+ElectronOutput(init, ruleset::Ruleset; kwargs...) = begin
     interface = InteractOutput(init, ruleset; kwargs...)
     window = newelectronwindow(interface)
     ElectronOutput(interface, window)

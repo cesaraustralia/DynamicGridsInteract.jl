@@ -14,7 +14,8 @@ abstract type AbstractInteractOutput{T} <: ImageOutput{T} end
 
 """
     InteractOutput(init, ruleset; fps=25, showfps=fps, store=false,
-                   processor=ColorProcessor(), extrainit=Dict())
+                   processor=ColorProcessor(), minval=nothing, maxval=nothing, 
+                   extrainit=Dict())
 
 An `Output` for Atom/Juno and Jupyter notebooks,
 and the back-end for [`ElectronOutput`](@ref) and [`ServerOutput`](@ref).
@@ -28,7 +29,7 @@ and the back-end for [`ElectronOutput`](@ref) and [`ServerOutput`](@ref).
 - `fps::Real`: frames per second
 - `showfps::Real`: maximum displayed frames per second
 - `store::Bool`: store the simulation frames to be used afterwards
-- `processor::FrameProcessor
+- `processor::GridProcessor
 - `minval::Number`: Minimum value to display in the simulation
 - `maxval::Number`: Maximum value to display in the simulation
 
