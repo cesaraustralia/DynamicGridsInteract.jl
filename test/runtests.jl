@@ -46,7 +46,7 @@ processor = ColorProcessor(ColorSchemes.leonardo, nothing, nothing)
                  l0 l0 l0 l0 l0 l0]
 
     ruleset = Ruleset(Life(); init=init, overflow=WrapOverflow())
-    output = InteractOutput(init, ruleset; store=true, processor=processor) 
+    output = InteractOutput(init, ruleset; store=true, processor=processor); 
     sim!(output, ruleset; init=init, tspan=(1, 2)) 
     sleep(5)
     resume!(output, ruleset; tstop=5)
@@ -55,9 +55,7 @@ processor = ColorProcessor(ColorSchemes.leonardo, nothing, nothing)
     @test output[3] == test
     @test output[5] == test2
 
-    @testset "output image matches colorshceme" begin
-        @test output.image_obs[].children.tail[1] == leonardo2
-        sleep(1.5)
+    @testset "output image matches colorscheme" begin
         @test output.image_obs[].children.tail[1] == leonardo2
     end
 end
@@ -68,10 +66,10 @@ end
     ruleset = Ruleset(Life(); init=init, overflow=WrapOverflow())
     output = ElectronOutput(init, ruleset; store=true, processor=processor) 
     DynamicGrids.setrunning!(output, false)
-    sim!(output, ruleset; init=init, tspan=(1, 3)) 
+    sim!(output.interface, ruleset; init=init, tspan=(1, 3)) 
     sleep(5)
     DynamicGrids.setrunning!(output, false)
-    resume!(output, ruleset; tstop=5)
+    resume!(output.interface, ruleset; tstop=5)
     sleep(5)
 
     @test output[3] == test

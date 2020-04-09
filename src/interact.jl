@@ -34,7 +34,7 @@ and the back-end for [`ElectronOutput`](@ref) and [`ServerOutput`](@ref).
 
 """
 @Image @Graphic @Output mutable struct InteractOutput{Pa,IM,TI,EI} <: AbstractInteractOutput{T}
-    # Field       | Default: @Output macro chains @default_kw
+    # Field       | Default: @Output macro chains @default_kw TODO don't chain @default
     page::Pa      | nothing
     image_obs::IM | nothing
     t_obs::TI     | nothing
@@ -42,8 +42,11 @@ and the back-end for [`ElectronOutput`](@ref) and [`ServerOutput`](@ref).
 end
 
 InteractOutput(frame, ruleset; kwargs...) = InteractOutput([frame], ruleset; kwargs...)
-InteractOutput(frames::AbstractVector, ruleset; tspan=(1, 1000),
-               extrainit=Dict(), throttle=0.1, kwargs...) = begin
+InteractOutput(frames::AbstractVector, ruleset;
+               tspan=(1, 1000),
+               extrainit=Dict(),
+               throttle=0.1,
+               kwargs...) = begin
 
     # settheme!(theme)
     extrainit[:init] = first(frames)
@@ -73,7 +76,6 @@ InteractOutput(frames::AbstractVector, ruleset; tspan=(1, 1000),
     sim = button("sim")
     resume = button("resume")
     stop = button("stop")
-    replay = button("replay")
 
     buttons = sim, resume, stop
     fps_slider = slider(1:200, value=fps(o), label="FPS")
@@ -90,13 +92,10 @@ InteractOutput(frames::AbstractVector, ruleset; tspan=(1, 1000),
 
     # Control mappings
     on(observe(sim)) do _
-        sim!(o, ruleset; init=init_drop[], tspan=tspan)
+        !isrunning(o) && sim!(o, ruleset; init=init_drop[], tspan=tspan)
     end
     on(observe(resume)) do _
-        resume!(o, ruleset; tstop=last(tspan))
-    end
-    on(observe(replay)) do _
-        replay(o)
+        !isrunning(o) && resume!(o, ruleset; tstop=last(tspan))
     end
     on(observe(stop)) do _
         setrunning!(o, false)
@@ -116,7 +115,7 @@ Base.show(o::InteractOutput) = show(o.page)
 # DynamicGrids interface
 DynamicGrids.isasync(o::InteractOutput) = true
 
-DynamicGrids.showgrid(image::AbstractArray{RGB24,2}, o::InteractOutput, f, t) = begin
+DynamicGrids.showimage(image::AbstractArray, o::InteractOutput, f, t) = begin
     o.t_obs[] = f
     o.image_obs[] = webimage(image)
 end
@@ -138,7 +137,6 @@ buildsliders(ruleset, _throttle) = begin
     slider_obs = map((s...) -> s, throttle.(_throttle, observe.(sliders))...)
     on(slider_obs) do s
         ruleset.rules = Flatten.reconstruct(ruleset.rules, s)
-        println(ruleset.rules)
     end
 
     group_title = nothing

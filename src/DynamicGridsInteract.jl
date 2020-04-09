@@ -7,13 +7,13 @@ using Blink,
       FieldDefaults,
       FieldMetadata,
       Flatten,
-      Images,
       Interact,
       InteractBase,
-      Lazy,
       Mux,
       WebIO,
       WebSockets
+
+const DG = DynamicGrids
 
 # Mixins
 using DynamicGrids: @Image, @Graphic, @Output, AbstractSimData, SimData, rules
@@ -23,9 +23,9 @@ import Base: length, size, firstindex, lastindex, getindex, setindex!, push!, ap
 import InteractBase: WidgetTheme, libraries
 
 import DynamicGrids: storegrid!, frames, showgrid, delay,
-    fps, showfps, currentgrid, frames, fps, delay,
-    isshowable, isasync, isstored, isrunning, starttime, stoptime, tspan, 
-    normalisegrid, grid2image, finalize!, storegrid!, 
+    fps, showfps, frames, fps, delay,
+    isshowable, isasync, isstored, isrunning, starttime, stoptime, tspan, processor,
+    grid2image, finalise, storegrid!,
     setstoptime!, setstarttime!, settimestamp!, setrunning!, setfps!
 
 export AbstractWebOutput, InteractOutput, ElectronOutput, ServerOutput
