@@ -18,7 +18,7 @@ WebSockets = "104b5d7c-a370-577a-8038-80a2059c5097"
 
 [compat]
 julia = "1"
-DynamicGrids = "0.6"
+DynamicGrids = "0.7"
 FieldDefaults = "0.2"
 FieldMetadata = "0.1"
 Flatten = "0.3"
