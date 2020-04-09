@@ -14,7 +14,7 @@ abstract type AbstractInteractOutput{T} <: ImageOutput{T} end
 
 """
     InteractOutput(init, ruleset; fps=25, showfps=fps, store=false,
-                   processor=ColorProcessor(), minval=nothing, maxval=nothing, 
+                   processor=ColorProcessor(), minval=nothing, maxval=nothing,
                    extrainit=Dict())
 
 An `Output` for Atom/Juno and Jupyter notebooks,
@@ -42,7 +42,7 @@ and the back-end for [`ElectronOutput`](@ref) and [`ServerOutput`](@ref).
     extrainit::EI | nothing
 end
 
-InteractOutput(init, ruleset; kwargs...) = 
+InteractOutput(init, ruleset; kwargs...) =
     InteractOutput([deepcopy(init)], ruleset; kwargs...)
 InteractOutput(frames::AbstractVector, ruleset;
                tspan=(1, 1000),
@@ -52,6 +52,7 @@ InteractOutput(frames::AbstractVector, ruleset;
 
     # settheme!(theme)
     extrainit[:init] = deepcopy(first(frames))
+    println(extrainit[:init])
 
     init = deepcopy(frames[1])
 
@@ -92,19 +93,35 @@ InteractOutput(frames::AbstractVector, ruleset;
     # Initialise image
     image_obs[] = webimage(grid2image(o, ruleset, o[1], 1))
 
-    # Control mappings
+    # Control mappings. Make errors visible in the console.
     on(observe(sim)) do _
-        !isrunning(o) && sim!(o, ruleset; init=init_drop[], tspan=tspan)
+        try
+            sim!(o, ruleset; init=init_drop[], tspan=tspan)
+        catch e
+            show(e)
+        end
     end
     on(observe(resume)) do _
-        !isrunning(o) && resume!(o, ruleset; tstop=last(tspan))
+        try
+            !isrunning(o) && resume!(o, ruleset; tstop=last(tspan))
+        catch e
+            println(e)
+        end
     end
     on(observe(stop)) do _
-        setrunning!(o, false)
+        try
+            setrunning!(o, false)
+        catch e
+            println(e)
+        end
     end
     on(observe(fps_slider)) do fps
-        o.fps = fps
-        settimestamp!(o, o.t_obs[])
+        try
+            o.fps = fps
+            settimestamp!(o, o.t_obs[])
+        catch e
+            println(e)
+        end
     end
 
     return o
@@ -118,6 +135,7 @@ Base.show(o::InteractOutput) = show(o.page)
 DynamicGrids.isasync(o::InteractOutput) = true
 
 DynamicGrids.showimage(image::AbstractArray, o::InteractOutput, f, t) = begin
+    println("frame: $f at: $t")
     o.t_obs[] = f
     o.image_obs[] = webimage(image)
 end
