@@ -8,15 +8,15 @@ init =  [0 0 0 0 0 0;
          0 0 0 1 1 1;
          0 0 0 0 0 1;
          0 0 0 0 1 0]
-               
-test =  [0 0 0 0 0 0;
+
+test3 = [0 0 0 0 0 0;
          0 0 0 0 0 0;
          0 0 0 0 1 1;
          0 0 0 1 0 1;
          0 0 0 0 0 1;
          0 0 0 0 0 0]
 
-test2 = [0 0 0 0 0 0;
+test5 = [0 0 0 0 0 0;
          0 0 0 0 0 0;
          1 0 0 0 1 1;
          1 0 0 0 0 0;
@@ -46,17 +46,27 @@ processor = ColorProcessor(ColorSchemes.leonardo, nothing, nothing)
                  l0 l0 l0 l0 l0 l0]
 
     ruleset = Ruleset(Life(); init=init, overflow=WrapOverflow())
-    output = InteractOutput(init, ruleset; store=true, processor=processor); 
-    sim!(output, ruleset; init=init, tspan=(1, 2)) 
+    output = InteractOutput(init, ruleset; store=true, processor=processor);
+    sim!(output, ruleset; init=init, tspan=(1, 2))
     sleep(5)
     resume!(output, ruleset; tstop=5)
     sleep(5)
 
-    @test output[3] == test
-    @test output[5] == test2
+    @test output[1] == init
+    @test output[3] == test3
+    @test output[5] == test5
 
     @testset "output image matches colorscheme" begin
         @test output.image_obs[].children.tail[1] == leonardo2
+    end
+
+    @testset "output works with store=false" begin
+        output = InteractOutput(init, ruleset; store=false, processor=processor);
+        sim!(output, ruleset; init=init, tspan=(1, 2))
+        sleep(5)
+        resume!(output, ruleset; tstop=5)
+        sleep(5)
+        @test output[1] == test5
     end
 end
 
@@ -64,16 +74,21 @@ end
 
 @testset "ElectronOutput" begin
     ruleset = Ruleset(Life(); init=init, overflow=WrapOverflow())
-    output = ElectronOutput(init, ruleset; store=true, processor=processor) 
+    output = ElectronOutput(init, ruleset; store=true, processor=processor)
     DynamicGrids.setrunning!(output, false)
-    sim!(output.interface, ruleset; init=init, tspan=(1, 3)) 
+    sim!(output.interface, ruleset; init=init, tspan=(1, 3))
     sleep(5)
     DynamicGrids.setrunning!(output, false)
     resume!(output.interface, ruleset; tstop=5)
     sleep(5)
 
-    @test output[3] == test
-    @test output[5] == test2
+    @test output[3] == test3
+    @test output[5] == test5
     close(output.window)
 end
 
+@testset "ServerOutput" begin
+    ruleset = Ruleset(Life(); init=init, overflow=WrapOverflow())
+    ServerOutput([init], ruleset; port=8080, processor=processor)
+    # TODO: test the server somehow
+end

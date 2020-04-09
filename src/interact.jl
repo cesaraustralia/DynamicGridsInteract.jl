@@ -41,7 +41,8 @@ and the back-end for [`ElectronOutput`](@ref) and [`ServerOutput`](@ref).
     extrainit::EI | nothing
 end
 
-InteractOutput(frame, ruleset; kwargs...) = InteractOutput([frame], ruleset; kwargs...)
+InteractOutput(init, ruleset; kwargs...) = 
+    InteractOutput([deepcopy(init)], ruleset; kwargs...)
 InteractOutput(frames::AbstractVector, ruleset;
                tspan=(1, 1000),
                extrainit=Dict(),
@@ -49,7 +50,7 @@ InteractOutput(frames::AbstractVector, ruleset;
                kwargs...) = begin
 
     # settheme!(theme)
-    extrainit[:init] = first(frames)
+    extrainit[:init] = deepcopy(first(frames))
 
     init = deepcopy(frames[1])
 
