@@ -96,7 +96,7 @@ InteractOutput(frames::AbstractVector, ruleset;
     # Control mappings. Make errors visible in the console.
     on(observe(sim)) do _
         try
-            sim!(o, ruleset; init=init_drop[], tspan=tspan)
+            !isrunning(o) && sim!(o, ruleset; init=init_drop[], tspan=tspan)
         catch e
             show(e)
         end
@@ -136,8 +136,12 @@ DynamicGrids.isasync(o::InteractOutput) = true
 
 DynamicGrids.showimage(image::AbstractArray, o::InteractOutput, f, t) = begin
     println("frame: $f at: $t")
-    o.t_obs[] = f
-    o.image_obs[] = webimage(image)
+    try
+        o.t_obs[] = f
+        o.image_obs[] = webimage(image)
+    catch e
+        println(e)
+    end
 end
 
 
