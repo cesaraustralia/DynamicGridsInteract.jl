@@ -1,12 +1,16 @@
 # DynamicGridsInteract
 
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://cesaraustralia.github.io/DynamicGridsInteract.jl/stable)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://cesaraustralia.github.io/DynamicGridsInteract.jl/dev)
 [![Build Status](https://travis-ci.org/cesaraustralia/DynamicGridsInteract.jl.svg?branch=master)](https://travis-ci.org/cesaraustralia/DynamicGridsInteract.jl)
 [![Codecov](https://codecov.io/gh/cesaraustralia/DynamicGridsInteract.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/cesaraustralia/DynamicGridsInteract.jl)
 
-Provides web interfaces for visualising and interacting with simulations from 
-DynamicGrids.jl, and for packages that build on it like Dispersal.jl. 
+DynamicGridsInteract provides web interfaces for visualising and interacting
+with simulations from
+[DynamicGrids.jl](https://cesaraustralia.github.io/DynamicGrids.jl), and for
+packages that build on it like [Dispersal.jl](https://cesaraustralia.github.io/Dispersal.jl). 
 
-The basic `InteractOutput` works in Jupyter notebooks and the atom plot pane,
+The basic `InteractOutput` works in the atom plot pane and Jupyter notebooks,
 and also serves as the core component of other outputs. A Mux.jl web server
 `ServerOutput` and a Blink.jl electron app `ElectronOutput` are also
 included.

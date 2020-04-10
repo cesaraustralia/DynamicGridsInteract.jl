@@ -9,7 +9,7 @@
 
 
 """
-Interact outputs including `InteractOuput` and `ElectronOutput`
+Abstract supertype of Interact outputs including `InteractOuput` and `ElectronOutput`
 """
 abstract type AbstractInteractOutput{T} <: ImageOutput{T} end
 
@@ -34,7 +34,6 @@ and the back-end for [`ElectronOutput`](@ref) and [`ServerOutput`](@ref).
 - `processor::GridProcessor
 - `minval::Number`: Minimum value to display in the simulation
 - `maxval::Number`: Maximum value to display in the simulation
-
 """
 @Image @Graphic @Output mutable struct InteractOutput{Pa,IM,TI,EI} <: AbstractInteractOutput{T}
     # Field       | Default: @Output macro chains @default_kw TODO don't chain @default
