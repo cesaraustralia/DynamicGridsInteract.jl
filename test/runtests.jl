@@ -1,4 +1,4 @@
-using DynamicGrids, DynamicGridsInteract, Test, Colors, ColorSchemes
+using DynamicGrids, DynamicGridsInteract, Test, Colors, ColorSchemes, ImageIO
 
 # life glider sims
 
