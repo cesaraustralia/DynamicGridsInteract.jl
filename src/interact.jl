@@ -8,7 +8,9 @@
 # libraries(::WebTheme) = vcat(libraries(InteractBulma.BulmaTheme()), [csskey])
 
 
-"Interact outputs including InteractOuput, ElectronOutput and ServerOutput"
+"""
+Interact outputs including `InteractOuput` and `ElectronOutput`
+"""
 abstract type AbstractInteractOutput{T} <: ImageOutput{T} end
 
 
