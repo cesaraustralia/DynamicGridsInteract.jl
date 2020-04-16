@@ -53,7 +53,6 @@ InteractOutput(frames::AbstractVector, ruleset;
 
     # settheme!(theme)
     extrainit[:init] = deepcopy(first(frames))
-    println(extrainit[:init])
 
     init = deepcopy(frames[1])
 
