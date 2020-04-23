@@ -34,11 +34,13 @@ Where `init` is either the initial array(s) for the simulation, ruleset is the
 
 To show the interface in the Atom plot pane, run `display(output)`.
 
-The interface also provides control of the simulation, using Interact.jl. It
+# Interact
+
+The interface provides control of the simulation using Interact.jl. It
 will automatically generate sliders for the parameters of the `Ruleset`, even
 for user-defined rules. 
 
 To define range limits for sliders, use the `@limits` macro from
-[FieldMetadata.jl](https://github.com/rafaqz/FieldMetadata.jl/). Fields to be
+[FieldMetadata.jl](https://github.com/rafaqz/FieldMetadata.jl/) on your struct. Fields to be
 ignored can be marked with `false` using the `@flatten` macro, and descriptions for
 hover text use `@description`.
