@@ -42,7 +42,3 @@ To define range limits for sliders, use the `@limits` macro from
 [FieldMetadata.jl](https://github.com/rafaqz/FieldMetadata.jl/). Fields to be
 ignored can be marked with `false` using the `@flatten` macro, and descriptions for
 hover text use `@description`.
-
-## Documentation
-
-See the documentation for [DynamicGrids.jl](https://cesaraustralia.github.io/DynamicGrids.jl/dev/)
