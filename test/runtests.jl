@@ -68,6 +68,7 @@ processor = ColorProcessor(scheme=ColorSchemes.leonardo)
         sleep(5)
         @test output[1] == test5
     end
+
 end
 
 
@@ -92,45 +93,3 @@ end
     ServerOutput([init], ruleset; port=8080, processor=processor)
     # TODO: test the server somehow
 end
-
-using DynamicGrids, DynamicGridsGtk, ColorSchemes, Colors
-
-const DEAD = 1
-const ALIVE = 2
-const BURNING = 3
-
-# Define the Rule struct
-struct ForestFire{R,W,N,PC,PR} <: NeighborhoodRule{R,W}
-    neighborhood::N
-    prob_combustion::PC
-    prob_regrowth::PR
-end
-ForestFire(; grid=:_default_, neighborhood=RadialNeighborhood{1}(), prob_combustion=0.0001, prob_regrowth=0.01) =
-    ForestFire{grid,grid}(neighborhood, prob_combustion, prob_regrowth)
-
-# Define an `applyrule` method to be broadcasted over the grid for the `ForestFire` rule
-@inline DynamicGrids.applyrule(rule::ForestFire, data, state::Integer, index, hoodbuffer) =
-    if state == ALIVE
-        if BURNING in DynamicGrids.neighbors(rule, hoodbuffer)
-            BURNING
-        else
-            rand() <= rule.prob_combustion ? BURNING : ALIVE
-        end
-    elseif state in BURNING
-        DEAD
-    else
-        rand() <= rule.prob_regrowth ? ALIVE : DEAD
-    end
-
-# Set up the init array, ruleset and output (using a Gtk window)
-init = fill(ALIVE, 400, 400)
-textconfig = TextConfig("arial", 
-ruleset = Ruleset(ForestFire(); init=init)
-processor = ColorProcessor(scheme=ColorSchemes.rainbow, zerocolor=RGB24(0.0))
-output = GtkOutput(init; fps=25, minval=DEAD, maxval=BURNING, processor=processor)
-
-# Run the simulation
-sim!(output, ruleset; tspan=(1, 200))
-
-# Save the output as a gif
-savegif("forestfire.gif", output)
