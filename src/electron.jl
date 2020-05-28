@@ -24,8 +24,8 @@ mutable struct ElectronOutput{T, I<:InteractOutput{T}} <: AbstractInteractOutput
     window::Blink.AtomShell.Window
 end
 
-ElectronOutput(init, ruleset::Ruleset; kwargs...) = begin
-    interface = InteractOutput(init, ruleset; kwargs...)
+ElectronOutput(; kwargs...) = begin
+    interface = InteractOutput(; kwargs...)
     window = newelectronwindow(interface)
     ElectronOutput(interface, window)
 end
@@ -37,20 +37,22 @@ Base.length(o::ElectronOutput) = length(interface(o))
 Base.size(o::ElectronOutput) = size(interface(o))
 Base.firstindex(o::ElectronOutput) = firstindex(interface(o))
 Base.lastindex(o::ElectronOutput) = lastindex(interface(o))
-Base.getindex(o::ElectronOutput, I...) = getindex(interface(o), I...)
-Base.setindex!(o::ElectronOutput, x, I...) = setindex!(interface(o), x, I...)
+Base.getindex(o::ElectronOutput, i::Union{Int,AbstractVector,Colon}) = 
+    getindex(interface(o), i)
+Base.setindex!(o::ElectronOutput, x, i::Union{Int,AbstractVector,Colon}) = 
+    setindex!(interface(o), x, i)
 Base.push!(o::ElectronOutput, x) = push!(interface(o), x)
 Base.append!(o::ElectronOutput, x) = append!(interface(o), x)
 
-DG.processor(o::ElectronOutput) = processor(interface(o))
 DG.frames(o::ElectronOutput) = frames(interface(o))
+DG.init(o::ElectronOutput) = init(interface(o))
 DG.starttime(o::ElectronOutput) = starttime(interface(o))
 DG.stoptime(o::ElectronOutput) = stoptime(interface(o))
 DG.tspan(o::ElectronOutput) = tspan(interface(o))
 DG.fps(o::ElectronOutput) = fps(interface(o))
-DG.showfps(o::ElectronOutput) = showfps(interface(o))
 DG.isasync(o::ElectronOutput) = isasync(interface(o))
 DG.isstored(o::ElectronOutput) = isstored(interface(o))
+DG.store(o::ElectronOutput) = store(interface(o))
 DG.isshowable(o::ElectronOutput) = isshowable(interface(o))
 
 DG.setfps!(o::ElectronOutput, x) = setfps!(interface(o), x)
@@ -61,6 +63,10 @@ DG.settimestamp!(o::ElectronOutput, x) = settimestamp!(interface(o), x)
 DG.initialise(o::ElectronOutput, args...) = initialise(interface(o), args...)
 DG.finalise(o::ElectronOutput, args...) = finalise(interface(o), args...)
 DG.delay(o::ElectronOutput, x) = delay(interface(o), x)
+
+DG.minval(o::ElectronOutput) = minval(interface(o))
+DG.maxval(o::ElectronOutput) = maxval(interface(o))
+DG.processor(o::ElectronOutput) = processor(interface(o))
 
 isalive(o::ElectronOutput) = o.window.content.sock.state == WebSockets.ReadyState(1)
 

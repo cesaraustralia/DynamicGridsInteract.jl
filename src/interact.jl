@@ -15,7 +15,7 @@ abstract type AbstractInteractOutput{T} <: ImageOutput{T} end
 
 
 """
-    InteractOutput(init, ruleset; fps=25, showfps=fps, store=false,
+    InteractOutput(init; ruleset, fps=25.0, store=false,
                    processor=ColorProcessor(), minval=nothing, maxval=nothing,
                    extrainit=Dict())
 
@@ -24,32 +24,26 @@ and the back-end for [`ElectronOutput`](@ref) and [`ServerOutput`](@ref).
 
 
 ### Arguments:
-- `init`: an Array or NamedTuple of arrays.
-- `ruleset`: the ruleset to run in the interface simulations.
+- `init`: initialisation Array or NamedTuple of arrays.
 
 ### Keyword Arguments:
-- `fps::Real`: frames per second
-- `showfps::Real`: maximum displayed frames per second
-- `store::Bool`: store the simulation frames to be used afterwards
+- `ruleset`: the ruleset to run in the interface simulations.
+- `tspan`: `AbstractRange` timespan for the simulation
+- `fps::Real`: frames per second to display the simulation
+- `store::Bool`: whether ot store the simulation frames for later use
 - `processor::GridProcessor
-- `minval::Number`: Minimum value to display in the simulation
-- `maxval::Number`: Maximum value to display in the simulation
+- `minval::Number`: minimum value to display in the simulation
+- `maxval::Number`: maximum value to display in the simulation
 """
-@Image @Graphic @Output mutable struct InteractOutput{Pa,IM,TI,EI} <: AbstractInteractOutput{T}
-    # Field       | Default: @Output macro chains @default_kw TODO don't chain @default
-    page::Pa      | nothing
-    image_obs::IM | nothing
-    t_obs::TI     | nothing
-    extrainit::EI | nothing
+@Image @Graphic @Output mutable struct InteractOutput{RS<:Ruleset,Pa,IM,TI} <: AbstractInteractOutput{T}
+    ruleset::RS
+    page::Pa
+    image_obs::IM
+    t_obs::TI
 end
-
-InteractOutput(init, ruleset; kwargs...) =
-    InteractOutput([deepcopy(init)], ruleset; kwargs...)
-InteractOutput(frames::AbstractVector, ruleset;
-               tspan=(1, 1000),
-               extrainit=Dict(),
-               throttle=0.1,
-               kwargs...) = begin
+# Defaults are passed in from ImageOutput constructor
+InteractOutput(; frames, init, mask, running, tspan, fps, timestamp, stampframe, store, processor,
+               minval, maxval, ruleset, extrainit=Dict(), throttle=0.1, kwargs...) = begin
 
     # settheme!(theme)
     extrainit[:init] = deepcopy(first(frames))
@@ -64,9 +58,11 @@ InteractOutput(frames::AbstractVector, ruleset;
     map!(timedisplay, t_obs) do t
         dom"div"(string(t))
     end
-
-    o = InteractOutput(; frames=frames, page=vbox(), image_obs=image_obs,
-                       t_obs=t_obs, extrainit=extrainit, kwargs...)
+    page = vbox()
+    o = InteractOutput(
+         frames, init, mask, running, tspan, fps, timestamp, stampframe, store,
+         processor, minval, maxval, ruleset, page, image_obs, t_obs
+    )
 
     # timespan_obs = Observable{Int}(DynamicGrids.stoptime(ui))
     # timespan_text = textbox("1000")
@@ -81,7 +77,7 @@ InteractOutput(frames::AbstractVector, ruleset;
     stop = button("stop")
 
     buttons = sim, resume, stop
-    fps_slider = slider(1:200, value=fps(o), label="FPS")
+    fps_slider = slider(1:200, value=fps, label="FPS")
     basewidgets = hbox(buttons..., fps_slider, init_drop)
 
     rulesliders = buildsliders(ruleset, throttle)
@@ -150,8 +146,8 @@ end
 buildsliders(ruleset, _throttle) = begin
     params = Flatten.flatten(rules(ruleset))
     fnames = fieldnameflatten(rules(ruleset))
-    lims = metaflatten(rules(ruleset), FieldMetadata.limits)
-    ranges = buildrange.(lims, params)
+    bounds_ = metaflatten(rules(ruleset), FieldMetadata.bounds)
+    ranges = buildrange.(bounds_, params)
     parents = parentnameflatten(rules(ruleset))
     descriptions = metaflatten(rules(ruleset), FieldMetadata.description)
     attributes = (p, n, d) -> Dict(:title => "$p.$n: $d").(parents, fnames, descriptions)
@@ -160,7 +156,11 @@ buildsliders(ruleset, _throttle) = begin
     sliders = buildslider.(params, fnames, ranges, attributes)
     slider_obs = map((s...) -> s, throttle.(_throttle, observe.(sliders))...)
     on(slider_obs) do s
-        ruleset.rules = Flatten.reconstruct(ruleset.rules, s)
+        try
+            ruleset.rules = Flatten.reconstruct(ruleset.rules, s)
+        catch e
+            println(e)
+        end
     end
 
     group_title = nothing
