@@ -35,20 +35,24 @@ and the back-end for [`ElectronOutput`](@ref) and [`ServerOutput`](@ref).
 - `minval::Number`: minimum value to display in the simulation
 - `maxval::Number`: maximum value to display in the simulation
 """
-@Image @Graphic @Output mutable struct InteractOutput{RS<:Ruleset,Pa,IM,TI} <: AbstractInteractOutput{T}
+mutable struct InteractOutput{T,F<:AbstractVector{T},E,GC,IC,RS<:Ruleset,Pa,IM,TI} <: AbstractInteractOutput{T}
+    frames::F
+    running::Bool 
+    extent::E
+    graphicconfig::GC
+    imageconfig::IC
     ruleset::RS
     page::Pa
     image_obs::IM
     t_obs::TI
 end
 # Defaults are passed in from ImageOutput constructor
-InteractOutput(; frames, init, mask, running, tspan, fps, timestamp, stampframe, store, processor,
-               minval, maxval, ruleset, extrainit=Dict(), throttle=0.1, kwargs...) = begin
+InteractOutput(; frames, running, extent, graphicconfig, imageconfig,
+               ruleset, extrainit=Dict(), throttle=0.1, kwargs...) = begin
 
     # settheme!(theme)
-    extrainit[:init] = deepcopy(first(frames))
 
-    init = deepcopy(frames[1])
+    extrainit[:init] = deepcopy(init(extent))
 
     # Standard output and controls
     image_obs = Observable{Any}(dom"div"())
@@ -60,8 +64,7 @@ InteractOutput(; frames, init, mask, running, tspan, fps, timestamp, stampframe,
     end
     page = vbox()
     o = InteractOutput(
-         frames, init, mask, running, tspan, fps, timestamp, stampframe, store,
-         processor, minval, maxval, ruleset, page, image_obs, t_obs
+         frames, running, extent, graphicconfig, imageconfig, ruleset, page, image_obs, t_obs
     )
 
     # timespan_obs = Observable{Int}(DynamicGrids.stoptime(ui))
@@ -77,7 +80,7 @@ InteractOutput(; frames, init, mask, running, tspan, fps, timestamp, stampframe,
     stop = button("stop")
 
     buttons = sim, resume, stop
-    fps_slider = slider(1:200, value=fps, label="FPS")
+    fps_slider = slider(1:200, value=fps(graphicconfig), label="FPS")
     basewidgets = hbox(buttons..., fps_slider, init_drop)
 
     rulesliders = buildsliders(ruleset, throttle)
@@ -92,14 +95,14 @@ InteractOutput(; frames, init, mask, running, tspan, fps, timestamp, stampframe,
     # Control mappings. Make errors visible in the console.
     on(observe(sim)) do _
         try
-            !isrunning(o) && sim!(o, ruleset; init=init_drop[], tspan=tspan)
+            !isrunning(o) && sim!(o, ruleset; init=init_drop[])
         catch e
             show(e)
         end
     end
     on(observe(resume)) do _
         try
-            !isrunning(o) && resume!(o, ruleset; tstop=last(tspan))
+            !isrunning(o) && resume!(o, ruleset; tstop=last(tspan(o)))
         catch e
             println(e)
         end
@@ -113,7 +116,7 @@ InteractOutput(; frames, init, mask, running, tspan, fps, timestamp, stampframe,
     end
     on(observe(fps_slider)) do fps
         try
-            o.fps = fps
+            setfps!(o, fps)
             settimestamp!(o, o.t_obs[])
         catch e
             println(e)
@@ -144,12 +147,13 @@ end
 # Utils
 
 buildsliders(ruleset, _throttle) = begin
-    params = Flatten.flatten(rules(ruleset))
-    fnames = fieldnameflatten(rules(ruleset))
-    bounds_ = metaflatten(rules(ruleset), FieldMetadata.bounds)
+    rs = rules(ruleset)
+    params = Flatten.flatten(rs)
+    fnames = fieldnameflatten(rs)
+    bounds_ = metaflatten(rs, FieldMetadata.bounds)
     ranges = buildrange.(bounds_, params)
-    parents = parentnameflatten(rules(ruleset))
-    descriptions = metaflatten(rules(ruleset), FieldMetadata.description)
+    parents = Tuple(string(p)[1] == '#' ? "" : p for p in parentnameflatten(rs))
+    descriptions = metaflatten(rs, FieldMetadata.description)
     attributes = (p, n, d) -> Dict(:title => "$p.$n: $d").(parents, fnames, descriptions)
 
 

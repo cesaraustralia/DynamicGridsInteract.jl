@@ -17,7 +17,7 @@ using Blink,
 const DG = DynamicGrids
 
 # Mixins
-using DynamicGrids: @Image, @Graphic, @Output, AbstractSimData, SimData, rules
+using DynamicGrids: AbstractSimData, SimData, rules
 
 import Base: length, size, firstindex, lastindex, getindex, setindex!, push!, append!, parent, show
 
@@ -26,7 +26,7 @@ import InteractBase: WidgetTheme, libraries
 import DynamicGrids: storegrid!, frames, init, showgrid, delay,
     fps, frames, fps, delay, starttime, stoptime, tspan, processor,
     isshowable, isasync, isstored, isrunning, 
-    grid2image, finalise, storegrid!,
+    grid2image, finalise, storegrid!, aux,
     setstoptime!, setstarttime!, settimestamp!, setrunning!, setfps!
 
 export AbstractWebOutput, InteractOutput, ElectronOutput, ServerOutput
