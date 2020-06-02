@@ -45,12 +45,12 @@ processor = ColorProcessor(scheme=ColorSchemes.leonardo)
                  l0 l0 l0 l0 l0 l1;
                  l0 l0 l0 l0 l0 l0]
 
-    ruleset = Ruleset(Life(); init=init, overflow=WrapOverflow())
-    output = InteractOutput(init, ruleset; store=true, processor=processor);
-    sim!(output, ruleset; init=init, tspan=(1, 2))
+    ruleset = Ruleset(Life(); overflow=WrapOverflow())
+    output = InteractOutput(init; tspan=1:2, ruleset=ruleset, store=true, processor=processor);
+    sim!(output, ruleset)
     sleep(5)
     resume!(output, ruleset; tstop=5)
-    sleep(5)
+    sleep(2)
 
     @test output[1] == init
     @test output[3] == test3
@@ -61,11 +61,11 @@ processor = ColorProcessor(scheme=ColorSchemes.leonardo)
     end
 
     @testset "output works with store=false" begin
-        output = InteractOutput(init, ruleset; store=false, processor=processor);
-        sim!(output, ruleset; init=init, tspan=(1, 2))
+        output = InteractOutput(init; ruleset=ruleset, tspan=1:2, store=false, processor=processor);
+        sim!(output, ruleset)
         sleep(5)
         resume!(output, ruleset; tstop=5)
-        sleep(5)
+        sleep(2)
         @test output[1] == test5
     end
 
@@ -74,22 +74,21 @@ end
 
 
 @testset "ElectronOutput" begin
-    ruleset = Ruleset(Life(); init=init, overflow=WrapOverflow())
-    output = ElectronOutput(init, ruleset; store=true, processor=processor)
+    ruleset = Ruleset(Life(); overflow=WrapOverflow())
+    output = ElectronOutput(init; ruleset=ruleset, tspan=1:3, store=true, processor=processor)
     DynamicGrids.setrunning!(output, false)
-    sim!(output.interface, ruleset; init=init, tspan=(1, 3))
+    sim!(output.interface, ruleset)
     sleep(5)
     DynamicGrids.setrunning!(output, false)
     resume!(output.interface, ruleset; tstop=5)
-    sleep(5)
-
+    sleep(2)
     @test output[3] == test3
     @test output[5] == test5
     close(output.window)
 end
 
 @testset "ServerOutput" begin
-    ruleset = Ruleset(Life(); init=init, overflow=WrapOverflow())
-    ServerOutput([init], ruleset; port=8080, processor=processor)
+    ruleset = Ruleset(Life(); overflow=WrapOverflow())
+    ServerOutput(init; ruleset=ruleset, port=8080, processor=processor)
     # TODO: test the server somehow
 end

@@ -24,8 +24,8 @@ mutable struct ElectronOutput{T, I<:InteractOutput{T}} <: AbstractInteractOutput
     window::Blink.AtomShell.Window
 end
 
-ElectronOutput(init, ruleset::Ruleset; kwargs...) = begin
-    interface = InteractOutput(init, ruleset; kwargs...)
+ElectronOutput(; kwargs...) = begin
+    interface = InteractOutput(; kwargs...)
     window = newelectronwindow(interface)
     ElectronOutput(interface, window)
 end
@@ -37,30 +37,41 @@ Base.length(o::ElectronOutput) = length(interface(o))
 Base.size(o::ElectronOutput) = size(interface(o))
 Base.firstindex(o::ElectronOutput) = firstindex(interface(o))
 Base.lastindex(o::ElectronOutput) = lastindex(interface(o))
-Base.getindex(o::ElectronOutput, I...) = getindex(interface(o), I...)
-Base.setindex!(o::ElectronOutput, x, I...) = setindex!(interface(o), x, I...)
+Base.getindex(o::ElectronOutput, i::Union{Int,AbstractVector,Colon}) = 
+    getindex(interface(o), i)
+Base.setindex!(o::ElectronOutput, x, i::Union{Int,AbstractVector,Colon}) = 
+    setindex!(interface(o), x, i)
 Base.push!(o::ElectronOutput, x) = push!(interface(o), x)
 Base.append!(o::ElectronOutput, x) = append!(interface(o), x)
 
-DG.processor(o::ElectronOutput) = processor(interface(o))
-DG.frames(o::ElectronOutput) = frames(interface(o))
-DG.starttime(o::ElectronOutput) = starttime(interface(o))
-DG.stoptime(o::ElectronOutput) = stoptime(interface(o))
-DG.tspan(o::ElectronOutput) = tspan(interface(o))
-DG.fps(o::ElectronOutput) = fps(interface(o))
-DG.showfps(o::ElectronOutput) = showfps(interface(o))
-DG.isasync(o::ElectronOutput) = isasync(interface(o))
-DG.isstored(o::ElectronOutput) = isstored(interface(o))
-DG.isshowable(o::ElectronOutput) = isshowable(interface(o))
+DG.frames(o::ElectronOutput) = DG.frames(interface(o))
+DG.init(o::ElectronOutput) = DG.init(interface(o))
+DG.aux(o::ElectronOutput) = DG.aux(interface(o))
+DG.mask(o::ElectronOutput) = DG.mask(interface(o))
+DG.extent(o::ElectronOutput) = DG.extent(interface(o))
+DG.graphicconfig(o::ElectronOutput) = DG.graphicconfig(interface(o))
+DG.imageconfig(o::ElectronOutput) = DG.imageconfig(interface(o))
+DG.starttime(o::ElectronOutput) = DG.starttime(interface(o))
+DG.stoptime(o::ElectronOutput) = DG.stoptime(interface(o))
+DG.tspan(o::ElectronOutput) = DG.tspan(interface(o))
+DG.fps(o::ElectronOutput) = DG.fps(interface(o))
+DG.isasync(o::ElectronOutput) = DG.isasync(interface(o))
+DG.isstored(o::ElectronOutput) = DG.isstored(interface(o))
+DG.store(o::ElectronOutput) = DG.store(interface(o))
+DG.isshowable(o::ElectronOutput) = DG.isshowable(interface(o))
 
-DG.setfps!(o::ElectronOutput, x) = setfps!(interface(o), x)
-DG.setrunning!(o::ElectronOutput, x) = setrunning!(interface(o), x)
-DG.setstarttime!(o::ElectronOutput, x) = setstarttime!(interface(o), x)
-DG.setstoptime!(o::ElectronOutput, x) = setstoptime!(interface(o), x)
-DG.settimestamp!(o::ElectronOutput, x) = settimestamp!(interface(o), x)
-DG.initialise(o::ElectronOutput, args...) = initialise(interface(o), args...)
-DG.finalise(o::ElectronOutput, args...) = finalise(interface(o), args...)
-DG.delay(o::ElectronOutput, x) = delay(interface(o), x)
+DG.setfps!(o::ElectronOutput, x) = DG.setfps!(interface(o), x)
+DG.setrunning!(o::ElectronOutput, x) = DG.setrunning!(interface(o), x)
+DG.setstarttime!(o::ElectronOutput, x) = DG.setstarttime!(interface(o), x)
+DG.setstoptime!(o::ElectronOutput, x) = DG.setstoptime!(interface(o), x)
+DG.settimestamp!(o::ElectronOutput, x) = DG.settimestamp!(interface(o), x)
+DG.initialise(o::ElectronOutput, args...) = DG.initialise(interface(o), args...)
+DG.finalise(o::ElectronOutput, args...) = DG.finalise(interface(o), args...)
+DG.delay(o::ElectronOutput, x) = DG.delay(interface(o), x)
+
+DG.minval(o::ElectronOutput) = DG.minval(interface(o))
+DG.maxval(o::ElectronOutput) = DG.maxval(interface(o))
+DG.processor(o::ElectronOutput) = DG.processor(interface(o))
 
 isalive(o::ElectronOutput) = o.window.content.sock.state == WebSockets.ReadyState(1)
 
@@ -70,8 +81,8 @@ DG.isrunning(o::ElectronOutput) = isalive(o) && isrunning(interface(o))
 DG.storegrid!(o::ElectronOutput, data::DynamicGrids.AbstractSimData) = 
     storegrid!(interface(o), data)
 
-DG.showgrid(o::ElectronOutput, args...) = 
-    showgrid(interface(o), args...)
+DG.showgrid(o::ElectronOutput, data::DG.AbstractSimData, args...) = 
+    showgrid(interface(o), data, args...)
 
 newelectronwindow(interface) = begin
     window = Blink.AtomShell.Window()
