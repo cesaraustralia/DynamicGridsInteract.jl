@@ -48,11 +48,9 @@ mutable struct InteractOutput{T,F<:AbstractVector{T},E,GC,IC,RS<:Ruleset,Pa,IM,T
 end
 # Defaults are passed in from ImageOutput constructor
 InteractOutput(; frames, running, extent, graphicconfig, imageconfig,
-               ruleset, extrainit=Dict(), throttle=0.1, kwargs...) = begin
+               ruleset, extrainit=nothing, throttle=0.1, interactive=true, kwargs...) = begin
 
     # settheme!(theme)
-
-    extrainit[:init] = deepcopy(init(extent))
 
     # Standard output and controls
     image_obs = Observable{Any}(dom"div"())
@@ -73,7 +71,12 @@ InteractOutput(; frames, running, extent, graphicconfig, imageconfig,
         # parse(Int, ts)
     # end
 
-    init_drop = dropdown(extrainit, value=extrainit[:init], label="Init")
+    init_drop = if extrainit isa Dict
+        extrainit[:init] = deepcopy(init(extent))
+        dropdown(extrainit, value=extrainit[:init], label="Init")
+    else
+        dom"div"()
+    end
 
     sim = button("sim")
     resume = button("resume")
@@ -83,8 +86,7 @@ InteractOutput(; frames, running, extent, graphicconfig, imageconfig,
     fps_slider = slider(1:200, value=fps(graphicconfig), label="FPS")
     basewidgets = hbox(buttons..., fps_slider, init_drop)
 
-    rulesliders = buildsliders(ruleset, throttle)
-
+    rulesliders = interactive ? buildsliders(ruleset, throttle) : dom"div"()
 
     # Put it all together into a webpage
     o.page = vbox(hbox(o.image_obs), timedisplay, basewidgets, rulesliders)

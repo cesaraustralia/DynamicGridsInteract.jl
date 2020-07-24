@@ -78,11 +78,11 @@ isalive(o::ElectronOutput) = o.window.content.sock.state == WebSockets.ReadyStat
 # Running checks depend on the blink window still being open
 DG.isrunning(o::ElectronOutput) = isalive(o) && isrunning(interface(o))
 
-DG.storegrid!(o::ElectronOutput, data::DynamicGrids.AbstractSimData) = 
-    storegrid!(interface(o), data)
+DG.storeframe!(o::ElectronOutput, data::DynamicGrids.AbstractSimData) = 
+    storeframe!(interface(o), data)
 
-DG.showgrid(o::ElectronOutput, data::DG.AbstractSimData, args...) = 
-    showgrid(interface(o), data, args...)
+DG.showframe(o::ElectronOutput, data::DG.AbstractSimData, args...) = 
+    showframe(interface(o), data, args...)
 
 newelectronwindow(interface) = begin
     window = Blink.AtomShell.Window()
