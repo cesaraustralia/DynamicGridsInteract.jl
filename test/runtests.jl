@@ -2,34 +2,34 @@ using DynamicGrids, DynamicGridsInteract, Test, Colors, ColorSchemes, ImageMagic
 
 # life glider sims
 
-init =  [0 0 0 0 0 0;
-         0 0 0 0 0 0;
-         0 0 0 0 0 0;
-         0 0 0 1 1 1;
-         0 0 0 0 0 1;
-         0 0 0 0 1 0]
+init =  Bool[0 0 0 0 0 0
+             0 0 0 0 0 0
+             0 0 0 0 0 0
+             0 0 0 1 1 1
+             0 0 0 0 0 1
+             0 0 0 0 1 0]
 
-test3 = [0 0 0 0 0 0;
-         0 0 0 0 0 0;
-         0 0 0 0 1 1;
-         0 0 0 1 0 1;
-         0 0 0 0 0 1;
+test3 = [0 0 0 0 0 0
+         0 0 0 0 0 0
+         0 0 0 0 1 1
+         0 0 0 1 0 1
+         0 0 0 0 0 1
          0 0 0 0 0 0]
 
-test5 = [0 0 0 0 0 0;
-         0 0 0 0 0 0;
-         1 0 0 0 1 1;
-         1 0 0 0 0 0;
-         0 0 0 0 0 1;
+test5 = [0 0 0 0 0 0
+         0 0 0 0 0 0
+         1 0 0 0 1 1
+         1 0 0 0 0 0
+         0 0 0 0 0 1
          0 0 0 0 0 0]
 
 g0 = ARGB32(0)
 g1 = ARGB32(1)
-grey2 = [g0 g0 g0 g0 g0 g0;
-         g0 g0 g0 g0 g0 g0;
-         g1 g0 g0 g0 g1 g1;
-         g1 g0 g0 g0 g0 g0;
-         g0 g0 g0 g0 g0 g1;
+grey2 = [g0 g0 g0 g0 g0 g0
+         g0 g0 g0 g0 g0 g0
+         g1 g0 g0 g0 g1 g1
+         g1 g0 g0 g0 g0 g0
+         g0 g0 g0 g0 g0 g1
          g0 g0 g0 g0 g0 g0]
 
 processor = ColorProcessor(scheme=ColorSchemes.leonardo)
@@ -38,11 +38,11 @@ processor = ColorProcessor(scheme=ColorSchemes.leonardo)
     l0 = ARGB32(get(ColorSchemes.leonardo, 0))
     l1 = ARGB32(get(ColorSchemes.leonardo, 1))
 
-    leonardo2 = [l0 l0 l0 l0 l0 l0;
-                 l0 l0 l0 l0 l0 l0;
-                 l1 l0 l0 l0 l1 l1;
-                 l1 l0 l0 l0 l0 l0;
-                 l0 l0 l0 l0 l0 l1;
+    leonardo2 = [l0 l0 l0 l0 l0 l0
+                 l0 l0 l0 l0 l0 l0
+                 l1 l0 l0 l0 l1 l1
+                 l1 l0 l0 l0 l0 l0
+                 l0 l0 l0 l0 l0 l1
                  l0 l0 l0 l0 l0 l0]
 
     ruleset = Ruleset(Life(); overflow=WrapOverflow())

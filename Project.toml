@@ -18,9 +18,9 @@ WebSockets = "104b5d7c-a370-577a-8038-80a2059c5097"
 
 [compat]
 Blink = "0.12"
-DynamicGrids = "0.9"
+DynamicGrids = "0.10"
 FieldDefaults = "0.3"
-FieldMetadata = "0.2"
+FieldMetadata = "0.3"
 Flatten = "0.3"
 ImageShow = "0.2.3"
 Interact = "0.10"

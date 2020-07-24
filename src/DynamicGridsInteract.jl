@@ -23,10 +23,9 @@ import Base: length, size, firstindex, lastindex, getindex, setindex!, push!, ap
 
 import InteractBase: WidgetTheme, libraries
 
-import DynamicGrids: storegrid!, frames, init, showgrid, delay,
-    fps, frames, fps, delay, starttime, stoptime, tspan, processor,
-    isshowable, isasync, isstored, isrunning, 
-    grid2image, finalise, storegrid!, aux,
+import DynamicGrids: storeframe!, showframe, frames, init, delay,
+    fps, delay, starttime, stoptime, tspan, processor,
+    isshowable, isasync, isstored, isrunning, grid2image, finalise, aux,
     setstoptime!, setstarttime!, settimestamp!, setrunning!, setfps!
 
 export AbstractWebOutput, InteractOutput, ElectronOutput, ServerOutput
