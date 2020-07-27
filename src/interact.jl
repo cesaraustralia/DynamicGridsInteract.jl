@@ -48,7 +48,7 @@ mutable struct InteractOutput{T,F<:AbstractVector{T},E,GC,IC,RS<:Ruleset,Pa,IM,T
 end
 # Defaults are passed in from ImageOutput constructor
 InteractOutput(; frames, running, extent, graphicconfig, imageconfig,
-               ruleset, extrainit=nothing, throttle=0.1, interactive=true, kwargs...) = begin
+               ruleset, extrainit=Dict(), throttle=0.1, interactive=true, kwargs...) = begin
 
     # settheme!(theme)
 
@@ -71,12 +71,8 @@ InteractOutput(; frames, running, extent, graphicconfig, imageconfig,
         # parse(Int, ts)
     # end
 
-    init_drop = if extrainit isa Dict
-        extrainit[:init] = deepcopy(init(extent))
-        dropdown(extrainit, value=extrainit[:init], label="Init")
-    else
-        dom"div"()
-    end
+    extrainit[:init] = deepcopy(init(extent))
+    init_drop = dropdown(extrainit, value=extrainit[:init], label="Init")
 
     sim = button("sim")
     resume = button("resume")
@@ -84,7 +80,7 @@ InteractOutput(; frames, running, extent, graphicconfig, imageconfig,
 
     buttons = sim, resume, stop
     fps_slider = slider(1:200, value=fps(graphicconfig), label="FPS")
-    basewidgets = hbox(buttons..., fps_slider, init_drop)
+    basewidgets = hbox(buttons..., fps_slider, (length(extrainit) > 1 ? (init_drop,) : ())...)
 
     rulesliders = interactive ? buildsliders(ruleset, throttle) : dom"div"()
 
@@ -99,7 +95,7 @@ InteractOutput(; frames, running, extent, graphicconfig, imageconfig,
         try
             !isrunning(o) && sim!(o, ruleset; init=init_drop[])
         catch e
-            show(e)
+            println(e)
         end
     end
     on(observe(resume)) do _
