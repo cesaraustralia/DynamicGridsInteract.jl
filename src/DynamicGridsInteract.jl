@@ -16,7 +16,7 @@ using Blink,
 
 const DG = DynamicGrids
 
-using DynamicGrids: AbstractSimData, SimData, rules, fps, init, tspan
+using DynamicGrids: AbstractSimData, SimData, rules, fps, init, tspan, isrunning, setrunning!
 
 import Base: length, size, firstindex, lastindex, getindex, setindex!, push!, append!, parent, show
 
