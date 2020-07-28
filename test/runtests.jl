@@ -61,8 +61,10 @@ processor = ColorProcessor(scheme=ColorSchemes.leonardo)
     end
 
     @testset "output works with store=false" begin
-        output = InteractOutput(init; ruleset=ruleset, tspan=1:2, store=false, processor=processor);
+        output = InteractOutput(init; ruleset=ruleset, tspan=1:3, store=false, processor=processor);
         sim!(output, ruleset)
+        output.graphicconfig.stoppedframe
+        DynamicGrids.stoppedframe(output)
         sleep(5)
         resume!(output, ruleset; tstop=5)
         sleep(2)
@@ -70,8 +72,6 @@ processor = ColorProcessor(scheme=ColorSchemes.leonardo)
     end
 
 end
-
-
 
 @testset "ElectronOutput" begin
     ruleset = Ruleset(Life(); overflow=WrapOverflow())
