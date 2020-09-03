@@ -88,7 +88,8 @@ InteractOutput(; frames, running, extent, graphicconfig, imageconfig,
     o.page = vbox(hbox(o.image_obs), timedisplay, basewidgets, rulesliders)
 
     # Initialise image
-    image_obs[] = webimage(DG.grid2image(o, ruleset, o[1], 1))
+    simdata = DynamicGrids.SimData(extent, ruleset)
+    image_obs[] = webimage(DG.grid2image(o, simdata, o[1], 1, first(extent.tspan)))
 
     # Control mappings. Make errors visible in the console.
     on(observe(sim)) do _
