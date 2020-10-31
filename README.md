@@ -15,6 +15,9 @@ and also serves as the core component of other outputs. A Mux.jl web server
 `ServerOutput` and a Blink.jl electron app `ElectronOutput` are also
 included.
 
+This demo shows the `InteractOutput` running it the atom IDE:
+
+[![Demo](https://img.youtube.com/vi/cXzYGHw_DaA/maxresdefault.jpg)](https://youtu.be/cXzYGHw_DaA)
 
 To use:
 
@@ -24,7 +27,6 @@ using DynamicGrids, DynamicGridsInteract
 output = InteractOutput(init; 
     ruleset=ruleset,
     tspan=1:100, 
-    store=false, 
     processor=ColorProcessor()
 )
 display(output)
