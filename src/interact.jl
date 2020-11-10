@@ -39,8 +39,8 @@ mutable struct InteractOutput{T,F<:AbstractVector{T},E,GC,IC,RS<:Ruleset,Pa,IM,T
 end
 # Most defaults are passed in from the generic ImageOutput constructor
 function InteractOutput(; 
-    frames, running, extent, graphicconfig, imageconfig,
-    ruleset, extrainit=Dict(), throttle=0.1, interactive=true, kwargs...
+    frames, running, extent, graphicconfig, imageconfig, ruleset, 
+    extrainit=Dict(), throttle=0.1, interactive=true, grouped=true, kwargs...
 )
     # Observables that update during the simulation
     image_obs = Observable{Any}(dom"div"())
@@ -54,17 +54,17 @@ function InteractOutput(;
 
     # Widgets
     timedisplay = time_text(t_obs)
-    controls = control_widgets(output, ruleset)
-    sliders = rule_sliders(ruleset, throttle, groups, interactive)
+    controls = control_widgets(output, ruleset, extrainit)
+    sliders = rule_sliders(ruleset, throttle, grouped, interactive)
 
     # Put it all together into a web page
     output.page = vbox(hbox(output.image_obs), timedisplay, controls, sliders)
 
     # Initialise image Observable
     simdata = DynamicGrids.SimData(extent, ruleset)
-    image_obs[] = _webimage(DG.grid2image(o, simdata, o[1], 1, first(extent.tspan)))
+    image_obs[] = _webimage(DG.grid2image(output, simdata, output[1], 1, first(extent.tspan)))
 
-    return hbox(sim, resume, stop, fps_slider, init_drop...)
+    return output
 end
 
 # Base interface
@@ -88,7 +88,6 @@ end
 _webimage(image) = dom"div"(image)
 
 
-
 # Widget buliding
 
 function time_text(t_obs::Observable)
@@ -99,22 +98,22 @@ function time_text(t_obs::Observable)
     return timedisplay
 end
 
-function rule_sliders(ruleset, throttle, groups, interactive)
+function rule_sliders(ruleset, throttle, grouped, interactive)
     if interactive 
-        return ModelParameters.attach_sliders!(ruleset; throttle=throttle, grouped=grouped) 
+        return InteractModels.attach_sliders!(ruleset; throttle=throttle, grouped=grouped) 
     else
         return dom"div"()
     end
 end
 
-function control_widgets(o::InteractOutput, ruleset)
+function control_widgets(o::InteractOutput, ruleset, extrainit)
     # We use the init dropdown for the simulation init, even if we don't 
     # show the dropdown because it only has 1 option.
-    extrainit[:init] = deepcopy(init(extent))
+    extrainit[:init] = deepcopy(init(o))
     init_dropdown = dropdown(extrainit, value=extrainit[:init], label="Init")
     maybe_init_dropdown = length(extrainit) > 1 ? (init_dropdown,) : ()
 
-    fps_slider = slider(1:200, value=fps(graphicconfig), label="FPS")
+    fps_slider = slider(1:200, value=fps(o), label="FPS")
 
     # Buttons
     sim = button("sim")
