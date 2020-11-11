@@ -73,18 +73,20 @@ processor = ColorProcessor(scheme=ColorSchemes.leonardo)
 
 end
 
-@testset "ElectronOutput" begin
-    ruleset = Ruleset(Life(); overflow=WrapOverflow())
-    output = ElectronOutput(init; ruleset=ruleset, tspan=1:3, store=true, processor=processor)
-    DynamicGrids.setrunning!(output, false)
-    sim!(output.interface, ruleset)
-    sleep(5)
-    DynamicGrids.setrunning!(output, false)
-    resume!(output.interface, ruleset; tstop=5)
-    sleep(2)
-    @test output[3] == test3
-    @test output[5] == test5
-    close(output.window)
+if !Sys.islinux() # No graphic head loaded in CI: TODO add this
+    @testset "ElectronOutput" begin
+        ruleset = Ruleset(Life(); overflow=WrapOverflow())
+        output = ElectronOutput(init; ruleset=ruleset, tspan=1:3, store=true, processor=processor)
+        DynamicGrids.setrunning!(output, false)
+        sim!(output.interface, ruleset)
+        sleep(5)
+        DynamicGrids.setrunning!(output, false)
+        resume!(output.interface, ruleset; tstop=5)
+        sleep(2)
+        @test output[3] == test3
+        @test output[5] == test5
+        close(output.window)
+    end
 end
 
 @testset "ServerOutput" begin
