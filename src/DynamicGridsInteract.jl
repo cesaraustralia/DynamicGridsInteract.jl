@@ -4,12 +4,10 @@ module DynamicGridsInteract
 
 using Blink,
       DynamicGrids,
-      FieldDefaults,
-      FieldMetadata,
-      Flatten,
       ImageShow,
       Interact,
       InteractBase,
+      InteractModels,
       Mux,
       WebIO,
       WebSockets

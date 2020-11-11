@@ -23,10 +23,9 @@ mutable struct ElectronOutput{T, I<:InteractOutput{T}} <: AbstractInteractOutput
     interface::I
     window::Blink.AtomShell.Window
 end
-
-ElectronOutput(; kwargs...) = begin
+function ElectronOutput(; kwargs...)
     interface = InteractOutput(; kwargs...)
-    window = newelectronwindow(interface)
+    window = _newelectronwindow(interface)
     ElectronOutput(interface, window)
 end
 
@@ -44,6 +43,7 @@ Base.setindex!(o::ElectronOutput, x, i::Union{Int,AbstractVector,Colon}) =
 Base.push!(o::ElectronOutput, x) = push!(interface(o), x)
 Base.append!(o::ElectronOutput, x) = append!(interface(o), x)
 
+# DynamicGrids.jl interface
 DG.frames(o::ElectronOutput) = DG.frames(interface(o))
 DG.init(o::ElectronOutput) = DG.init(interface(o))
 DG.aux(o::ElectronOutput) = DG.aux(interface(o))
@@ -72,24 +72,28 @@ DG.minval(o::ElectronOutput) = DG.minval(interface(o))
 DG.maxval(o::ElectronOutput) = DG.maxval(interface(o))
 DG.processor(o::ElectronOutput) = DG.processor(interface(o))
 
-isalive(o::ElectronOutput) = o.window.content.sock.state == WebSockets.ReadyState(1)
-
-# Running checks depend on the blink window still being open
-DG.isrunning(o::ElectronOutput) = isalive(o) && isrunning(interface(o))
-
-DG.storeframe!(o::ElectronOutput, data::DynamicGrids.AbstractSimData) = 
+DG.storeframe!(o::ElectronOutput, data::DG.AbstractSimData) =
     storeframe!(interface(o), data)
-
-DG.showframe(o::ElectronOutput, data::DG.AbstractSimData, args...) = 
+DG.showframe(o::ElectronOutput, data::DG.AbstractSimData, args...) =
     showframe(interface(o), data, args...)
 
-newelectronwindow(interface) = begin
-    window = Blink.AtomShell.Window()
-    body!(window, interface.page)
-    window
+
+# Running checks depend on the blink window still being open
+DG.isrunning(o::ElectronOutput) = _isalive(o) && isrunning(interface(o))
+
+_isalive(o::ElectronOutput) = o.window.content.sock.state == WebSockets.ReadyState(1)
+
+# Display
+
+function Base.display(o::ElectronOutput)
+    if !_isalive(o)
+        o.window = _newelectronwindow(interface(o))
+    end
+    return nothing
 end
 
-Base.display(o::ElectronOutput) =
-    if !isalive(o)
-        o.window = newelectronwindow(interface(o))
-    end
+function _newelectronwindow(interface)
+    window = Blink.AtomShell.Window()
+    body!(window, interface.page)
+    return window
+end

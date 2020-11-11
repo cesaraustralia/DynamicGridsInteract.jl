@@ -19,16 +19,16 @@ mutable struct ServerOutput{I}
     init::I
     port::Int
 end
-ServerOutput(init; port=8080, ruleset, kwargs...) = begin
+function ServerOutput(init; port=8080, ruleset, kwargs...)
     server = ServerOutput(init, port)
     function app(request)
         InteractOutput(deepcopy(server.init); ruleset=deepcopy(ruleset), kwargs...).page
     end
     WebIO.webio_serve(Mux.page("/", request -> app(request)), port)
-    server
+    return server
 end
 
-show(io::IO, output::ServerOutput) = begin
+function Base.show(io::IO, output::ServerOutput)
     println(io, typeof(output))
     println(io, "Port: ", output.port)
 end
