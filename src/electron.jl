@@ -73,13 +73,13 @@ DG.maxval(o::ElectronOutput) = DG.maxval(interface(o))
 DG.processor(o::ElectronOutput) = DG.processor(interface(o))
 
 DG.storeframe!(o::ElectronOutput, data::DG.AbstractSimData) =
-    storeframe!(interface(o), data)
+    DG.storeframe!(interface(o), data)
 DG.showframe(o::ElectronOutput, data::DG.AbstractSimData, args...) =
-    showframe(interface(o), data, args...)
+    DG.showframe(interface(o), data, args...)
 
 
 # Running checks depend on the blink window still being open
-DG.isrunning(o::ElectronOutput) = _isalive(o) && isrunning(interface(o))
+DG.isrunning(o::ElectronOutput) = _isalive(o) && DG.isrunning(interface(o))
 
 _isalive(o::ElectronOutput) = o.window.content.sock.state == WebSockets.ReadyState(1)
 

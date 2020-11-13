@@ -123,29 +123,29 @@ function control_widgets(o::InteractOutput, ruleset, extrainit)
     # Control mappings. Make errors visible in the console.
     on(observe(sim)) do _
         try
-            !isrunning(o) && sim!(o, ruleset; init=init_dropdown[])
+            !DG.isrunning(o) && sim!(o, ruleset; init=init_dropdown[])
         catch e
             println(e)
         end
     end
     on(observe(resume)) do _
         try
-            !isrunning(o) && resume!(o, ruleset; tstop=last(tspan(o)))
+            !DG.isrunning(o) && resume!(o, ruleset; tstop=last(tspan(o)))
         catch e
             println(e)
         end
     end
     on(observe(stop)) do _
         try
-            setrunning!(o, false)
+            DG.setrunning!(o, false)
         catch e
             println(e)
         end
     end
     on(observe(fps_slider)) do fps
         try
-            setfps!(o, fps)
-            settimestamp!(o, o.t_obs[])
+            DG.setfps!(o, fps)
+            DG.settimestamp!(o, o.t_obs[])
         catch e
             println(e)
         end
