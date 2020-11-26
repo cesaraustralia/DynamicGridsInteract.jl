@@ -1,7 +1,7 @@
 name = "DynamicGridsInteract"
 uuid = "3ccff026-9a20-11e9-1704-43e1c6ed0af5"
 authors = ["Rafael Schouten <rafaelschouten@gmail.com>"]
-version = "0.4.0"
+version = "0.4.1"
 
 [deps]
 Blink = "ad839575-38b3-5650-b840-f874b8c74a25"
@@ -20,7 +20,7 @@ DynamicGrids = "0.12"
 ImageShow = "0.2.3"
 Interact = "0.10"
 InteractBase = "0.10"
-InteractModels = "0.2"
+InteractModels = "0.3"
 Mux = "0.7"
 WebIO = "0.8"
 WebSockets = "1.5"
