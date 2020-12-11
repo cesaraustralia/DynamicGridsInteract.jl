@@ -19,7 +19,7 @@ ElectronOutput(init, ruleset; tspan=(1, 100))
 
 Keyword arguments are passed to [`InteractOutput`](@ref).
 """
-mutable struct ElectronOutput{T, I<:InteractOutput{T}} <: AbstractInteractOutput{T}
+mutable struct ElectronOutput{T,F,I<:InteractOutput{T,F}} <: AbstractInteractOutput{T,F}
     interface::I
     window::Blink.AtomShell.Window
 end
@@ -64,8 +64,10 @@ DG.setrunning!(o::ElectronOutput, x) = DG.setrunning!(interface(o), x)
 DG.settspan!(o::ElectronOutput, x) = DG.settspan!(interface(o), x)
 DG.settimestamp!(o::ElectronOutput, x) = DG.settimestamp!(interface(o), x)
 DG.setstoppedframe!(o::ElectronOutput, x) = DG.setstoppedframe!(interface(o), x)
-DG.initialise(o::ElectronOutput, args...) = DG.initialise(interface(o), args...)
-DG.finalise(o::ElectronOutput, args...) = DG.finalise(interface(o), args...)
+DG.initialise!(o::ElectronOutput, args...) = DG.initialise!(interface(o), args...)
+DG.finalise!(o::ElectronOutput, args...) = DG.finalise!(interface(o), args...)
+DG.initialisegraphics(o::ElectronOutput, args...) = DG.initialisegraphics(interface(o), args...)
+DG.finalisegraphics(o::ElectronOutput, args...) = DG.finalisegraphics(interface(o), args...)
 DG.delay(o::ElectronOutput, x) = DG.delay(interface(o), x)
 
 DG.minval(o::ElectronOutput) = DG.minval(interface(o))
