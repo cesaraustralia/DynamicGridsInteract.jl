@@ -41,7 +41,7 @@ processor = ColorProcessor(
     ruleset = Ruleset(Life(); boundary=Wrap())
     output = InteractOutput(init; tspan=1:2, ruleset=ruleset, store=true, processor=processor);
     sim!(output, ruleset)
-    sleep(5)
+    sleep(10)
     resume!(output, ruleset; tstop=5)
     sleep(2)
 
@@ -58,7 +58,7 @@ processor = ColorProcessor(
         sim!(output, ruleset)
         output.graphicconfig.stoppedframe
         DynamicGrids.stoppedframe(output)
-        sleep(5)
+        sleep(10)
         resume!(output, ruleset; tstop=5)
         sleep(2)
         @test output[1] == test5
@@ -72,7 +72,7 @@ if !Sys.islinux() # No graphic head loaded in CI: TODO add this
         output = ElectronOutput(init; ruleset=ruleset, tspan=1:3, store=true, processor=processor)
         DynamicGrids.setrunning!(output, false)
         sim!(output.interface, ruleset)
-        sleep(5)
+        sleep(10)
         DynamicGrids.setrunning!(output, false)
         resume!(output.interface, ruleset; tstop=5)
         sleep(2)
