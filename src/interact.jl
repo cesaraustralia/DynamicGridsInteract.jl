@@ -2,7 +2,7 @@
 """
 Abstract supertype of Interact outputs including `InteractOuput` and `ElectronOutput`
 """
-abstract type AbstractInteractOutput{T} <: ImageOutput{T} end
+abstract type AbstractInteractOutput{T,F} <: ImageOutput{T,F} end
 
 
 """
@@ -26,7 +26,7 @@ and the back-end for [`ElectronOutput`](@ref) and [`ServerOutput`](@ref).
 - `minval::Number`: minimum value to display in the simulation
 - `maxval::Number`: maximum value to display in the simulation
 """
-mutable struct InteractOutput{T,F<:AbstractVector{T},E,GC,IC,RS<:Ruleset,Pa,IM,TI} <: AbstractInteractOutput{T}
+mutable struct InteractOutput{T,F<:AbstractVector{T},E,GC,IC,RS<:Ruleset,Pa,IM,TI} <: AbstractInteractOutput{T,F}
     frames::F
     running::Bool 
     extent::E
@@ -53,16 +53,16 @@ function InteractOutput(;
     )
 
     # Widgets
-    timedisplay = time_text(t_obs)
-    controls = control_widgets(output, ruleset, extrainit)
-    sliders = rule_sliders(ruleset, throttle, grouped, interactive)
+    timedisplay = _time_text(t_obs)
+    controls = _control_widgets(output, ruleset, extrainit)
+    sliders = _rule_sliders(ruleset, throttle, grouped, interactive)
 
     # Put it all together into a web page
     output.page = vbox(hbox(output.image_obs), timedisplay, controls, sliders)
 
     # Initialise image Observable
     simdata = DynamicGrids.SimData(extent, ruleset)
-    image_obs[] = _webimage(DG.grid2image(output, simdata, output[1], 1, first(extent.tspan)))
+    # image_obs[] = _webimage(DG.grid2image(output, simdata)
 
     return output
 end
@@ -73,11 +73,10 @@ Base.show(o::InteractOutput) = show(o.page)
 
 # DynamicGrids interface
 DynamicGrids.isasync(o::InteractOutput) = true
-function DynamicGrids.showimage(image::AbstractArray, o::InteractOutput, f, t)
-    println("frame: $f at: $t")
+function DynamicGrids.showimage(image::AbstractArray, o::InteractOutput, data::AbstractSimData)
     # Update simulation image, makeing sure any errors are printed in the REPL
     try
-        o.t_obs[] = f
+        o.t_obs[] = currentframe(data)
         o.image_obs[] = _webimage(image)
     catch e
         println(e)
@@ -90,7 +89,7 @@ _webimage(image) = dom"div"(image)
 
 # Widget buliding
 
-function time_text(t_obs::Observable)
+function _time_text(t_obs::Observable)
     timedisplay = Observable{Any}(dom"div"("0"))
     map!(timedisplay, t_obs) do t
         dom"div"(string(t))
@@ -98,7 +97,7 @@ function time_text(t_obs::Observable)
     return timedisplay
 end
 
-function rule_sliders(ruleset, throttle, grouped, interactive)
+function _rule_sliders(ruleset, throttle, grouped, interactive)
     if interactive 
         return InteractModels.attach_sliders!(ruleset; throttle=throttle, grouped=grouped) 
     else
@@ -106,7 +105,7 @@ function rule_sliders(ruleset, throttle, grouped, interactive)
     end
 end
 
-function control_widgets(o::InteractOutput, ruleset, extrainit)
+function _control_widgets(o::InteractOutput, ruleset, extrainit)
     # We use the init dropdown for the simulation init, even if we don't 
     # show the dropdown because it only has 1 option.
     extrainit[:init] = deepcopy(init(o))
@@ -123,29 +122,29 @@ function control_widgets(o::InteractOutput, ruleset, extrainit)
     # Control mappings. Make errors visible in the console.
     on(observe(sim)) do _
         try
-            !isrunning(o) && sim!(o, ruleset; init=init_dropdown[])
+            !DG.isrunning(o) && sim!(o, ruleset; init=init_dropdown[])
         catch e
             println(e)
         end
     end
     on(observe(resume)) do _
         try
-            !isrunning(o) && resume!(o, ruleset; tstop=last(tspan(o)))
+            !DG.isrunning(o) && resume!(o, ruleset; tstop=last(tspan(o)))
         catch e
             println(e)
         end
     end
     on(observe(stop)) do _
         try
-            setrunning!(o, false)
+            DG.setrunning!(o, false)
         catch e
             println(e)
         end
     end
     on(observe(fps_slider)) do fps
         try
-            setfps!(o, fps)
-            settimestamp!(o, o.t_obs[])
+            DG.setfps!(o, fps)
+            DG.settimestamp!(o, o.t_obs[])
         catch e
             println(e)
         end
