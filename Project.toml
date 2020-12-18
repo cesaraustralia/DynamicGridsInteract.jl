@@ -1,7 +1,7 @@
 name = "DynamicGridsInteract"
 uuid = "3ccff026-9a20-11e9-1704-43e1c6ed0af5"
 authors = ["Rafael Schouten <rafaelschouten@gmail.com>"]
-version = "0.4.1"
+version = "0.5.0"
 
 [deps]
 Blink = "ad839575-38b3-5650-b840-f874b8c74a25"
