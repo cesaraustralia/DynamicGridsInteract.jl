@@ -39,7 +39,7 @@ To show the interface in the Atom plot pane, run `display(output)`.
 
 # Interactive parameters
 
-The interface provides control of the simulation using ModelParameters.jl and Interact.jl bia InteractModels.jl. 
+The interface provides control of the simulation using ModelParameters.jl and Interact.jl via InteractModels.jl. 
 It will automatically generate sliders for every `ModelParameters.Param` parameter in the `Ruleset`, given they 
 additionally have either a `range` (an `AbstractRange`) or `bounds` (a `Tuple`) field defined.
 
