@@ -37,13 +37,10 @@ Where `init` is the initial array(s) for the simulation and ruleset is the
 
 To show the interface in the Atom plot pane, run `display(output)`.
 
-# Interact
+# Interactive parameters
 
-The interface provides control of the simulation using Interact.jl. It
-will automatically generate sliders for the parameters of the `Ruleset`, even
-for user-defined rules. 
+The interface provides control of the simulation using ModelParameters.jl and Interact.jl bia InteractModels.jl. 
+It will automatically generate sliders for every `ModelParameters.Param` parameter in the `Ruleset`, given they 
+additionally have either a `range` (an `AbstractRange`) or `bounds` (a `Tuple`) field defined.
 
-To define range limits for sliders, use the `@bounds` macro from
-[FieldMetadata.jl](https://github.com/rafaqz/FieldMetadata.jl/) on your `struct`. Fields to be
-ignored can be marked with `false` using the `@flatten` macro, and descriptions for
-hover text use `@description`.
+See the examples in the InteractModels.jl [docs](https://rafaqz.github.io/ModelParameters.jl/stable/interactmodels/).
