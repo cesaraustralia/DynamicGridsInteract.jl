@@ -23,8 +23,8 @@ test5 = [0 0 0 0 0 0
          0 0 0 0 0 1
          0 0 0 0 0 0]
 
-processor = ColorProcessor(
-    scheme=ColorSchemes.leonardo, zerocolor=nothing, maskcolor=nothing, textconfig=nothing,
+imagegen = Image(
+    scheme=ColorSchemes.leonardo, zerocolor=nothing, maskcolor=nothing,
 )
 
 @testset "InteractOutput" begin
@@ -39,7 +39,9 @@ processor = ColorProcessor(
                  l0 l0 l0 l0 l0 l0]
 
     ruleset = Ruleset(Life(); boundary=Wrap())
-    output = InteractOutput(init; tspan=1:2, ruleset=ruleset, store=true, processor=processor);
+    output = InteractOutput(init; 
+        tspan=1:2, ruleset=ruleset, store=true, text=nothing, imagegen=imagegen
+    )
     sim!(output, ruleset)
     sleep(10)
     resume!(output, ruleset; tstop=5)
@@ -54,7 +56,9 @@ processor = ColorProcessor(
     end
 
     @testset "output works with store=false" begin
-        output = InteractOutput(init; ruleset=ruleset, tspan=1:3, store=false, processor=processor);
+        output = InteractOutput(init; 
+            ruleset=ruleset, tspan=1:3, store=false, text=nothing, imagegen=imagegen
+        )
         sim!(output, ruleset)
         output.graphicconfig.stoppedframe
         DynamicGrids.stoppedframe(output)
@@ -69,7 +73,9 @@ end
 if !Sys.islinux() # No graphic head loaded in CI: TODO add this
     @testset "ElectronOutput" begin
         ruleset = Ruleset(Life(); boundary=Wrap())
-        output = ElectronOutput(init; ruleset=ruleset, tspan=1:3, store=true, processor=processor)
+        output = ElectronOutput(init; 
+            ruleset=ruleset, tspan=1:300, store=true, text=nothing, imagegen=imagegen
+        )
         DynamicGrids.setrunning!(output, false)
         sim!(output.interface, ruleset)
         sleep(10)
@@ -84,6 +90,6 @@ end
 
 @testset "ServerOutput" begin
     ruleset = Ruleset(Life(); boundary=Wrap())
-    ServerOutput(init; ruleset=ruleset, port=8080, processor=processor)
+    ServerOutput(init; ruleset=ruleset, port=8080, imagegen=imagegen)
     # TODO: test the server somehow
 end

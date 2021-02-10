@@ -6,25 +6,27 @@ abstract type AbstractInteractOutput{T,F} <: ImageOutput{T,F} end
 
 
 """
-    InteractOutput(init; ruleset, fps=25.0, store=false,
-                   processor=ColorProcessor(), minval=nothing, maxval=nothing,
-                   extrainit=Dict())
+    InteractOutput <: DynamicGrids.ImageOutput
+
+    InteractOutput(init; ruleset, kw...)
 
 An `Output` for Atom/Juno and Jupyter notebooks,
 and the back-end for [`ElectronOutput`](@ref) and [`ServerOutput`](@ref).
 
-
 ### Arguments:
-- `init`: initialisation Array or NamedTuple of arrays.
 
-### Keyword Arguments:
-- `ruleset`: the ruleset to run in the interface simulations.
-- `tspan`: `AbstractRange` timespan for the simulation
+- `init`: initialisation `Array` or `NamedTuple` of arrays.
+
+### Keywords
+
+- `ruleset::Ruleset`: the ruleset to run in the interface simulations.
+- `tspan::AbstractRange`: timespan for the simulation
 - `fps::Real`: frames per second to display the simulation
-- `store::Bool`: whether ot store the simulation frames for later use
-- `processor::GridProcessor
-- `minval::Number`: minimum value to display in the simulation
-- `maxval::Number`: maximum value to display in the simulation
+- `store::Bool`: whether ot store the simulation frames for later use.
+- `imagegen::ImageGenerator`: Converts the grid to an image, auto-detected by default.
+- `minval::Number`: minimum value to display from a grid, `0` by default.
+- `maxval::Number`: maximum value to display from a grid, `1` by default.
+
 """
 mutable struct InteractOutput{T,F<:AbstractVector{T},E,GC,IC,RS<:Ruleset,Pa,IM,TI} <: AbstractInteractOutput{T,F}
     frames::F
