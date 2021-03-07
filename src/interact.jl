@@ -4,6 +4,7 @@ Abstract supertype of Interact outputs including `InteractOuput` and `ElectronOu
 """
 abstract type AbstractInteractOutput{T,F} <: ImageOutput{T,F} end
 
+const output_css = Asset(joinpath(@__DIR__, "..", "assets", "style.css"))
 
 """
     InteractOutput <: DynamicGrids.ImageOutput
@@ -49,9 +50,9 @@ function InteractOutput(;
     t_obs = Observable{Int}(1)
 
     # Page and output construction
-    page = vbox()
+    page = Scope()
     output = InteractOutput(
-         frames, running, extent, graphicconfig, imageconfig, ruleset, page, image_obs, t_obs
+        frames, running, extent, graphicconfig, imageconfig, ruleset, page, image_obs, t_obs
     )
 
     # Widgets
@@ -60,11 +61,19 @@ function InteractOutput(;
     sliders = _rule_sliders(ruleset, throttle, grouped, interactive)
 
     # Put it all together into a web page
-    output.page = vbox(hbox(output.image_obs), timedisplay, controls, sliders)
+    output.page = Scope(
+        imports=[output_css],
+        dom=vbox(
+            dom"div.resizable"(output.image_obs; title="Drag bottom right to resize"), 
+            timedisplay, 
+            controls, 
+            sliders
+        ),
+    )
 
     # Initialise image Observable
     simdata = DynamicGrids.SimData(extent, ruleset)
-    # image_obs[] = _webimage(DG.grid2image(output, simdata)
+    image_obs[] = _webimage(DG.grid_to_image!(output, simdata))
 
     return output
 end
