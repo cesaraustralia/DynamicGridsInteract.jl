@@ -9,7 +9,7 @@ const output_css = Asset(joinpath(@__DIR__, "..", "assets", "style.css"))
 """
     InteractOutput <: DynamicGrids.ImageOutput
 
-    InteractOutput(init; ruleset, kw...)
+    InteractOutput(init; ruleset, tspan, kw...)
 
 An `Output` for Atom/Juno and Jupyter notebooks,
 and the back-end for [`ElectronOutput`](@ref) and [`ServerOutput`](@ref).
@@ -27,7 +27,12 @@ and the back-end for [`ElectronOutput`](@ref) and [`ServerOutput`](@ref).
 - `imagegen::ImageGenerator`: Converts the grid to an image, auto-detected by default.
 - `minval::Number`: minimum value to display from a grid, `0` by default.
 - `maxval::Number`: maximum value to display from a grid, `1` by default.
-
+- `extrainit::Dict` : alternatives to `init`, available in a dropdown.
+- `interative::Bool`: whether to add interactive sliders. Default is `true`.
+- `grouped::Bool`: whether to group sliders by their parent object.
+- `throttle::Real` : time in seconds to throttle slider updates, default is `0.1`.
+- `ncolumns::Int`: number of columns of sliders. 
+    By default this will be chosen based on the number of sliders.
 """
 mutable struct InteractOutput{T,F<:AbstractVector{T},E,GC,IC,RS<:Ruleset,Pa,IM,TI} <: AbstractInteractOutput{T,F}
     frames::F
@@ -43,7 +48,7 @@ end
 # Most defaults are passed in from the generic ImageOutput constructor
 function InteractOutput(; 
     frames, running, extent, graphicconfig, imageconfig, ruleset, 
-    extrainit=Dict(), throttle=0.1, interactive=true, grouped=true, kwargs...
+    extrainit=Dict(), throttle=0.1, interactive=true, grouped=true, ncolumns=nothing, kwargs...
 )
     # Observables that update during the simulation
     image_obs = Observable{Any}(dom"div"())
@@ -58,7 +63,7 @@ function InteractOutput(;
     # Widgets
     timedisplay = _time_text(t_obs)
     controls = _control_widgets(output, ruleset, extrainit)
-    sliders = _rule_sliders(ruleset, throttle, grouped, interactive)
+    sliders = _rule_sliders(ruleset, ncolumns, throttle, grouped, interactive)
 
     # Put it all together into a web page
     output.page = Scope(
@@ -67,7 +72,7 @@ function InteractOutput(;
             dom"div.resizable"(output.image_obs; title="Drag bottom right to resize"), 
             timedisplay, 
             controls, 
-            sliders
+            hbox(sliders),
         ),
     )
 
@@ -108,9 +113,9 @@ function _time_text(t_obs::Observable)
     return timedisplay
 end
 
-function _rule_sliders(ruleset, throttle, grouped, interactive)
+function _rule_sliders(ruleset, ncolumns, throttle, grouped, interactive)
     if interactive 
-        return InteractModels.attach_sliders!(ruleset; throttle=throttle, grouped=grouped) 
+        return InteractModels.attach_sliders!(ruleset; ncolumns=ncolumns, throttle=throttle, grouped=grouped) 
     else
         return dom"div"()
     end

@@ -1,21 +1,14 @@
 
 """
-    ElectronOutput(init, ruleset::Ruleset; kwargs...)
+    ElectronOutput(init; ruleset, tspan, kw...)
 
 A html output using Interact.jl and an Electron window through Blink.jl
 ElectronOutput automatically generates sliders to control simulations
 in realtime. args and kwargs are passed to [`InteractOutput`](@ref).
 
-## Example
-```julia
-using Blink
-ElectronOutput(init, ruleset; tspan=(1, 100))
-```
-
 ### Arguments
 
-- `init`: initialisation array, or `NamedTuple` of arrays
-- `ruleset::Ruleset`: A DynamicGrids `Ruleset` 
+- `init`: initialisation array, or `NamedTuple` of arrays.
 
 Keyword arguments are passed to [`InteractOutput`](@ref).
 """
