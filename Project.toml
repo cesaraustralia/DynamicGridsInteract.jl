@@ -16,7 +16,7 @@ WebSockets = "104b5d7c-a370-577a-8038-80a2059c5097"
 
 [compat]
 Blink = "0.12"
-DynamicGrids = "0.13, 0.14, 0.15, 0.16, 0.17"
+DynamicGrids = "^0.18.2"
 ImageShow = "0.2.3, 0.3"
 Interact = "0.10"
 InteractBase = "0.10"
