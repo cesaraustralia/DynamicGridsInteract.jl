@@ -72,7 +72,7 @@ DG.delay(o::ElectronOutput, x) = DG.delay(interface(o), x)
 
 DG.minval(o::ElectronOutput) = DG.minval(interface(o))
 DG.maxval(o::ElectronOutput) = DG.maxval(interface(o))
-DG.imagegen(o::ElectronOutput) = DG.imagegen(interface(o))
+DG.renderer(o::ElectronOutput) = DG.renderer(interface(o))
 
 DG.storeframe!(o::ElectronOutput, data::DG.AbstractSimData) =
     DG.storeframe!(interface(o), data)

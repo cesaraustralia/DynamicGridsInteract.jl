@@ -73,7 +73,7 @@ function InteractOutput(;
 
     # Initialise image Observable
     simdata = DynamicGrids.SimData(extent, ruleset)
-    image_obs[] = _webimage(DG.grid_to_image!(output, simdata))
+    image_obs[] = _webimage(DG.render!(output, simdata))
 
     return output
 end
