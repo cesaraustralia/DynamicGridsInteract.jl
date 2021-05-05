@@ -43,7 +43,7 @@ end
 # Most defaults are passed in from the generic ImageOutput constructor
 function InteractOutput(; 
     frames, running, extent, graphicconfig, imageconfig, ruleset, 
-    extrainit=Dict(), throttle=0.1, interactive=true, grouped=true, kwargs...
+    extrainit=Dict(), throttle=0.1, interactive=true, kw...
 )
     # Observables that update during the simulation
     image_obs = Observable{Any}(dom"div"())
@@ -58,7 +58,7 @@ function InteractOutput(;
     # Widgets
     timedisplay = _time_text(t_obs)
     controls = _control_widgets(output, ruleset, extrainit)
-    sliders = _rule_sliders(ruleset, throttle, grouped, interactive)
+    sliders = _rule_sliders(ruleset, throttle, interactive)
 
     # Put it all together into a web page
     output.page = Scope(
@@ -108,9 +108,9 @@ function _time_text(t_obs::Observable)
     return timedisplay
 end
 
-function _rule_sliders(ruleset, throttle, grouped, interactive)
+function _rule_sliders(ruleset, throttle, interactive)
     if interactive 
-        return InteractModels.attach_sliders!(ruleset; throttle=throttle, grouped=grouped) 
+        return InteractModels.attach_sliders!(ruleset; throttle=throttle, submodel=Rule) 
     else
         return dom"div"()
     end
