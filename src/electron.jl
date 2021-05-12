@@ -32,47 +32,29 @@ end
 interface(o::ElectronOutput) = o.interface
 
 # Forward output methods to InteractOutput: ElectronOutput is just a wrapper.
-Base.length(o::ElectronOutput) = length(interface(o))
-Base.size(o::ElectronOutput) = size(interface(o))
-Base.firstindex(o::ElectronOutput) = firstindex(interface(o))
-Base.lastindex(o::ElectronOutput) = lastindex(interface(o))
-Base.getindex(o::ElectronOutput, i::Union{Int,AbstractVector,Colon}) = 
-    getindex(interface(o), i)
-Base.setindex!(o::ElectronOutput, x, i::Union{Int,AbstractVector,Colon}) = 
-    setindex!(interface(o), x, i)
-Base.push!(o::ElectronOutput, x) = push!(interface(o), x)
-Base.append!(o::ElectronOutput, x) = append!(interface(o), x)
+for f in (:length, :size, :firstindex, :lastindex)
+    @eval $f(o::ElectronOutput) = $f(interface(o))
+end
+
+for f in (:getindex, :setindex!, :push!, :append!)
+    @eval $f(o::ElectronOutput, x) = $f(interface(o), x)
+end
 
 # DynamicGrids.jl interface
-DG.frames(o::ElectronOutput) = DG.frames(interface(o))
-DG.init(o::ElectronOutput) = DG.init(interface(o))
-DG.aux(o::ElectronOutput) = DG.aux(interface(o))
-DG.mask(o::ElectronOutput) = DG.mask(interface(o))
-DG.extent(o::ElectronOutput) = DG.extent(interface(o))
-DG.graphicconfig(o::ElectronOutput) = DG.graphicconfig(interface(o))
-DG.imageconfig(o::ElectronOutput) = DG.imageconfig(interface(o))
-DG.stoppedframe(o::ElectronOutput) = DG.stoppedframe(interface(o))
-DG.tspan(o::ElectronOutput) = DG.tspan(interface(o))
-DG.fps(o::ElectronOutput) = DG.fps(interface(o))
-DG.isasync(o::ElectronOutput) = DG.isasync(interface(o))
-DG.isstored(o::ElectronOutput) = DG.isstored(interface(o))
-DG.store(o::ElectronOutput) = DG.store(interface(o))
-DG.isshowable(o::ElectronOutput) = DG.isshowable(interface(o))
+for f in (
+    :frames, :init, :aux, :mask, :extent, :graphicconfig, :imageconfig,
+    :stoppedframe, :tspan, :fps, :isasync, :isstored, :store, :isshowable,
+    :minval, :maxval, :renderer
+)
+   @eval DG.$f(o::ElectronOutput) = DG.$f(interface(o))
+end
 
-DG.setfps!(o::ElectronOutput, x) = DG.setfps!(interface(o), x)
-DG.setrunning!(o::ElectronOutput, x) = DG.setrunning!(interface(o), x)
-DG.settspan!(o::ElectronOutput, x) = DG.settspan!(interface(o), x)
-DG.settimestamp!(o::ElectronOutput, x) = DG.settimestamp!(interface(o), x)
-DG.setstoppedframe!(o::ElectronOutput, x) = DG.setstoppedframe!(interface(o), x)
-DG.initialise!(o::ElectronOutput, args...) = DG.initialise!(interface(o), args...)
-DG.finalise!(o::ElectronOutput, args...) = DG.finalise!(interface(o), args...)
-DG.initialisegraphics(o::ElectronOutput, args...) = DG.initialisegraphics(interface(o), args...)
-DG.finalisegraphics(o::ElectronOutput, args...) = DG.finalisegraphics(interface(o), args...)
-DG.delay(o::ElectronOutput, x) = DG.delay(interface(o), x)
-
-DG.minval(o::ElectronOutput) = DG.minval(interface(o))
-DG.maxval(o::ElectronOutput) = DG.maxval(interface(o))
-DG.renderer(o::ElectronOutput) = DG.renderer(interface(o))
+for f in (
+    :setfps!, :setrunning!, :settspan!, :settimestamp!, :setstoppedframe!,
+    :initialise!, :finalise!, :initialisegraphics, :finalisegraphics, :maybesleep,
+)
+   @eval DG.$f(o::ElectronOutput, args...) = DG.$f(interface(o), args...)
+end
 
 DG.storeframe!(o::ElectronOutput, data::DG.AbstractSimData) =
     DG.storeframe!(interface(o), data)
