@@ -1,5 +1,7 @@
 
 """
+    AbstractInteractOutput
+
 Abstract supertype of Interact outputs including `InteractOuput` and `ElectronOutput`
 """
 abstract type AbstractInteractOutput{T,F} <: ImageOutput{T,F} end
@@ -7,27 +9,33 @@ abstract type AbstractInteractOutput{T,F} <: ImageOutput{T,F} end
 const output_css = Asset(joinpath(@__DIR__, "..", "assets", "style.css"))
 
 """
-    InteractOutput <: DynamicGrids.ImageOutput
+    InteractOutput <: AbstractInteractOutput
 
     InteractOutput(init; ruleset, kw...)
 
 An `Output` for Atom/Juno and Jupyter notebooks,
 and the back-end for [`ElectronOutput`](@ref) and [`ServerOutput`](@ref).
 
-### Arguments:
+# Arguments:
 
 - `init`: initialisation `Array` or `NamedTuple` of arrays.
 
-### Keywords
+# Keywords
 
 - `ruleset::Ruleset`: the ruleset to run in the interface simulations.
-- `tspan::AbstractRange`: timespan for the simulation
-- `fps::Real`: frames per second to display the simulation
-- `store::Bool`: whether ot store the simulation frames for later use.
-- `imagegen::ImageGenerator`: Converts the grid to an image, auto-detected by default.
-- `minval::Number`: minimum value to display from a grid, `0` by default.
-- `maxval::Number`: maximum value to display from a grid, `1` by default.
+- `tspan`: `AbstractRange` timespan for the simulation
+- `aux`: NamedTuple of arbitrary input data. Use `get(data, Aux(:key), I...)` 
+    to access from a `Rule` in a type-stable way.
+- `mask`: `BitArray` for defining cells that will/will not be run.
+- `padval`: padding value for grids with neighborhood rules. The default is `zero(eltype(init))`.
+- `font`: `String` font name, used in default `TextConfig`. A default will be guessed.
+- `text`: `TextConfig` object or `nothing` for no text.
+- `scheme`: ColorSchemes.jl scheme, or `Greyscale()`
+- `renderer`: `Renderer` such as `Image` or `Layout`
+- `minval`: minimum value(s) to set colour maximum
+- `maxval`: maximum values(s) to set colour minimum
 
+(See DynamicGrids.jl docs for more details)
 """
 mutable struct InteractOutput{T,F<:AbstractVector{T},E,GC,IC,RS<:Ruleset,Pa,IM,TI} <: AbstractInteractOutput{T,F}
     frames::F
@@ -43,7 +51,7 @@ end
 # Most defaults are passed in from the generic ImageOutput constructor
 function InteractOutput(; 
     frames, running, extent, graphicconfig, imageconfig, ruleset, 
-    extrainit=Dict(), throttle=0.1, interactive=true, grouped=true, kwargs...
+    extrainit=Dict(), throttle=0.1, interactive=true, kw...
 )
     # Observables that update during the simulation
     image_obs = Observable{Any}(dom"div"())
@@ -58,7 +66,7 @@ function InteractOutput(;
     # Widgets
     timedisplay = _time_text(t_obs)
     controls = _control_widgets(output, ruleset, extrainit)
-    sliders = _rule_sliders(ruleset, throttle, grouped, interactive)
+    sliders = _rule_sliders(ruleset, throttle, interactive)
 
     # Put it all together into a web page
     output.page = Scope(
@@ -71,9 +79,7 @@ function InteractOutput(;
         ),
     )
 
-    # Initialise image Observable
-    simdata = DynamicGrids.SimData(extent, ruleset)
-    image_obs[] = _webimage(DG.render!(output, simdata))
+    # Initialise image Observable simdata = DynamicGrids.SimData(extent, ruleset) image_obs[] = _webimage(DG.render!(output, simdata))
 
     return output
 end
@@ -108,9 +114,9 @@ function _time_text(t_obs::Observable)
     return timedisplay
 end
 
-function _rule_sliders(ruleset, throttle, grouped, interactive)
+function _rule_sliders(ruleset, throttle, interactive)
     if interactive 
-        return InteractModels.attach_sliders!(ruleset; throttle=throttle, grouped=grouped) 
+        return InteractModels.attach_sliders!(ruleset; throttle=throttle, submodel=Rule) 
     else
         return dom"div"()
     end

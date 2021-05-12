@@ -1,19 +1,22 @@
 """
-    ServerOutput(frames, rulset, args...; port=8080, kwargs...)
+    ServerOutput(init; port=8080, rulset, tspan, kw...)
 
 A basic Mux.jl webserver, serving a [`InteractOutput`](@ref)s to the web.
 
-Unlike ElectronOutput, the parameter modifications are not written back
-to the original rulset, and the simulations are not stored. 
-Each page load gets a identical initialised rulset.
+Unlike [`ElectronOutput`](@ref), the parameter modifications are not 
+written back to the original rulset, and the simulations are not stored. 
+Each page load gets a newly initialised Rulset.
 
-### Arguments
-- `init`: `AbstractArray` or `NamedTuple` of `Array`
-- `ruleset::Models`: tuple of rulset wrapped in Models().
+# Arguments
 
-### Keyword arguments
+- `init`: initialisation `Array` or `NamedTuple` of `Array`
+
+# Keyword arguments
+
 - `port`: port number to reach the server. ie localhost:8080
-- `kwargs`: keyword arguments to be passed to [`InteractOuput`](@ref).
+- `ruleset::Ruleset`: the ruleset to run in the interface simulations.
+- `tspan`: `AbstractRange` timespan for the simulation
+- `kw`: other keyword arguments to be passed to [`InteractOuput`](@ref).
 """
 mutable struct ServerOutput{I}
     init::I

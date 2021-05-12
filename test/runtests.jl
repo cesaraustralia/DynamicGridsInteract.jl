@@ -1,4 +1,15 @@
-using DynamicGrids, DynamicGridsInteract, Test, Colors, ColorSchemes, ImageMagick
+using DynamicGrids, DynamicGridsInteract, Test, Colors, ColorSchemes, ImageMagick, Aqua
+
+if VERSION >= v"1.5.0"
+    # Amibiguities are not owned by DynamicGrids
+    # Aqua.test_ambiguities([DynamicGrids, Base, Core])
+    Aqua.test_unbound_args(DynamicGridsInteract)
+    Aqua.test_undefined_exports(DynamicGridsInteract)
+    Aqua.test_project_extras(DynamicGridsInteract)
+    # Aqua.test_stale_deps(DynamicGrids)
+    Aqua.test_deps_compat(DynamicGridsInteract)
+    Aqua.test_project_toml_formatting(DynamicGridsInteract)
+end
 
 # life glider sims
 
