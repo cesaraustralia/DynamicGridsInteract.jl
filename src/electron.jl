@@ -27,8 +27,13 @@ for f in (:length, :size, :firstindex, :lastindex)
     @eval $f(o::ElectronOutput) = $f(interface(o))
 end
 
-for f in (:getindex, :setindex!, :push!, :append!)
+for f in (:push!, :append!)
     @eval $f(o::ElectronOutput, x) = $f(interface(o), x)
+end
+
+for f in (:getindex, :view, :setindex!)
+    @eval $f(o::ElectronOutput, i::Union{Colon,AbstractArray}) = $f(interface(o), i)
+    @eval $f(o::ElectronOutput, i::Int) = $f(interface(o), i)
 end
 
 # DynamicGrids.jl interface

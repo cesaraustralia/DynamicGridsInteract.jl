@@ -18,7 +18,7 @@ using DynamicGrids: AbstractSimData, SimData, rules, fps, init, tspan, isrunning
 
 import Base: length, size, firstindex, lastindex, getindex, setindex!, push!, append!, parent, show
 
-export AbstractWebOutput, InteractOutput, ElectronOutput, ServerOutput
+export AbstractInteractOutput, InteractOutput, ElectronOutput, ServerOutput
 
 include("interact.jl")
 include("electron.jl")
