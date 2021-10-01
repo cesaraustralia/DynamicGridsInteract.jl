@@ -34,7 +34,7 @@ test5 = [0 0 0 0 0 0
          0 0 0 0 0 1
          0 0 0 0 0 0]
 
-imagegen = Image(
+renderer = Image(
     scheme=ColorSchemes.leonardo, zerocolor=nothing, maskcolor=nothing,
 )
 
@@ -51,7 +51,7 @@ imagegen = Image(
 
     ruleset = Ruleset(Life(); boundary=Wrap())
     output = InteractOutput(init; 
-        tspan=1:2, ruleset=ruleset, store=true, text=nothing, imagegen=imagegen
+        tspan=1:2, ruleset=ruleset, store=true, text=nothing, renderer=renderer
     )
     sim!(output, ruleset)
     sleep(10)
@@ -68,7 +68,7 @@ imagegen = Image(
 
     @testset "output works with store=false" begin
         output = InteractOutput(init; 
-            ruleset=ruleset, tspan=1:3, store=false, text=nothing, imagegen=imagegen
+            ruleset=ruleset, tspan=1:3, store=false, text=nothing, renderer=renderer
         )
         sim!(output, ruleset)
         output.graphicconfig.stoppedframe
@@ -85,7 +85,7 @@ if !Sys.islinux() # No graphic head loaded in CI: TODO add this
     @testset "ElectronOutput" begin
         ruleset = Ruleset(Life(); boundary=Wrap())
         output = ElectronOutput(init; 
-            ruleset=ruleset, tspan=1:300, store=true, text=nothing, imagegen=imagegen
+            ruleset=ruleset, tspan=1:300, store=true, text=nothing, renderer=renderer
         )
         DynamicGrids.setrunning!(output, false)
         sim!(output.interface, ruleset)
@@ -101,6 +101,6 @@ end
 
 @testset "ServerOutput" begin
     ruleset = Ruleset(Life(); boundary=Wrap())
-    ServerOutput(init; ruleset=ruleset, port=8080, imagegen=imagegen)
+    ServerOutput(init; ruleset=ruleset, port=8080, renderer=renderer)
     # TODO: test the server somehow
 end
