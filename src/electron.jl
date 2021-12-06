@@ -8,7 +8,13 @@ A html output using Interact.jl and an Electron window through Blink.jl
 ElectronOutput automatically generates sliders to control simulations
 in realtime. args and kwargs are passed to [`InteractOutput`](@ref).
 
-Keyword arguments are passed to [`InteractOutput`](@ref).
+# Arguments
+
+- `init`: initialisation `AbstractArray` or `NamedTuple` of `AbstractArray`.
+
+# Keywords
+
+$INTERACT_OUTPUT_KEYWORDS
 """
 mutable struct ElectronOutput{T,F,I<:InteractOutput{T,F}} <: AbstractInteractOutput{T,F}
     interface::I
