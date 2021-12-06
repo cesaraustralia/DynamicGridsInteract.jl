@@ -13,19 +13,19 @@ Each page load gets a newly initialised Rulset.
 
 # Keyword arguments
 
-- `port`: port number to reach the server. ie localhost:8080
-- `ruleset::Ruleset`: the ruleset to run in the interface simulations.
-- `tspan`: `AbstractRange` timespan for the simulation
-- `kw`: other keyword arguments to be passed to [`InteractOuput`](@ref).
+- `port`: port number to reach the server. `8080` by default, found at `localhost:8080`.
+$INTERACT_OUTPUT_KEYWORDS
+
+An `ImageConfig` object can be also passed to the `imageconfig` keyword, and other keywords will be ignored.
 """
 mutable struct ServerOutput{I}
     init::I
     port::Int
 end
-function ServerOutput(init; port=8080, ruleset, kwargs...)
+function ServerOutput(init; port=8080, ruleset, kw...)
     server = ServerOutput(init, port)
     function app(request)
-        InteractOutput(deepcopy(server.init); ruleset=deepcopy(ruleset), kwargs...).page
+        InteractOutput(deepcopy(server.init); ruleset=deepcopy(ruleset), kw...).page
     end
     WebIO.webio_serve(Mux.page("/", request -> app(request)), port)
     return server
